@@ -2,16 +2,18 @@
 
 -- DROP TABLE IF EXISTS public.user_contact;
 
-CREATE TABLE IF NOT EXISTS public.user_contact
+create table if not exists public.user_contact
 (
-    id integer NOT NULL DEFAULT nextval('user_contact_id_seq'::regclass),
-    user_id bigint NOT NULL,
-    contact character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT user_contact_pkey PRIMARY KEY (id),
-    CONSTRAINT user_contact_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    id serial not null,
+    user_id bigint not null,
+    contact character varying(255) COLLATE pg_catalog."default" not null,
+    created_at timestamp with time zone default now(),
+    updated_at timestamp with time zone,
+    constraint user_contact_pkey primary key (id),
+    constraint user_contact_user_id_fkey foreign key (user_id)
+        references public."user" (id) match simple
+        on update no action
+        on delete no action
 )
 
 TABLESPACE pg_default;

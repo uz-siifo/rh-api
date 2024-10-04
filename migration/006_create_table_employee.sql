@@ -2,26 +2,23 @@
 
 -- DROP TABLE IF EXISTS public.employee;
 
-CREATE TABLE IF NOT EXISTS public.employee
+create table if not exists public.employee
 (
-    id integer NOT NULL DEFAULT nextval('employee_id_seq'::regclass),
-    user_id bigint NOT NULL,
-    position_at_work position_at_work NOT NULL,
-    nuit bigint NOT NULL,
-    identity_card_bi character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    salary double precision NOT NULL DEFAULT 0,
-    date_admission timestamp without time zone NOT NULL,
-    department_id bigint NOT NULL,
-    academic_level character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT employee_pkey PRIMARY KEY (id),
-    CONSTRAINT employee_department_id_fkey FOREIGN KEY (department_id)
-        REFERENCES public.department (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT employee_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    id serial not null nextval('employee_id_seq'::regclass),
+    position_at_work position_at_work_enum not null,
+    nuit bigint not null,
+    identity_card_bi character varying(255) COLLATE pg_catalog."default" not null,
+    salary double precision not null default 0,
+    date_admission timestamp without time zone not null,
+    department_id bigint not null,
+    academic_level character varying(255) COLLATE pg_catalog."default" not null,
+    created_at timestamp with time zone default now(),
+    updated_at timestamp with time zone,
+    constraint employee_pkey primary key (id),
+    constraint employee_department_id_fkey foreign key (department_id)
+        references public.department (id) match simple
+        on update no action
+        on delete no action
 )
 
 TABLESPACE pg_default;
