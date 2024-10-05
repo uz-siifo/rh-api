@@ -1,7 +1,8 @@
 from .model import model as BaseModel
 
-class department(BaseModel):
-    def __init__(self, name, employee_nums, min_salary, max_salary, updated_at) -> None:
+class Department(BaseModel):
+    def __init__(self, name, employee_nums=0, min_salary=0.0, max_salary=0.0, updated_at=None) -> None:
+        super().__init__()
         self.name = name
         self.employee_nums = employee_nums
         self.min_salary = min_salary
@@ -16,15 +17,16 @@ class department(BaseModel):
             "max_salary": self.max_salary,
             "updated_at": self.updated_at
         }
-    
-    def from_json(self, __department):
+
+    @classmethod
+    def from_json(cls, department_data):
         try:
-            return department(
-                __department["name"],
-                __department["employee_nums"],
-                __department["min_salary"],
-                __department["max_salary"],
-                __department["updated_at"]
+            return cls(
+                department_data.get("name"),
+                department_data.get("employee_nums", 0),
+                department_data.get("min_salary", 0.0),
+                department_data.get("max_salary", 0.0),
+                department_data.get("updated_at")
             )
         except Exception as e:
-              print(e)
+            print(f"Error: {e}")

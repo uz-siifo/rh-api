@@ -1,10 +1,10 @@
-import sys
-
-# sys.path.append('/sistema-rh-api/config/')
-import config.connect
+from db.connect import conn, cur
 
 class user_service:
-    def create(self, user):
+    def create(self):
+        cur.execute("select* from department;")
+        res = cur.fetchone()
+        print(res)
         # conn.e
         pass
 

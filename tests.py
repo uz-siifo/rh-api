@@ -16,4 +16,3 @@ user = user_service()
 
 user.create()
 # cur.execute("select* from department;")
-
