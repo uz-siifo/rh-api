@@ -1,8 +1,5 @@
-import sys
+from .model import model as BaseModel
 
-sys.path.append('/sistema-rh-api/model/') 
-from model import model
-
-class month_records(model):
+class month_records(BaseModel):
     def __init(self, month, year, presences_num, absences_num, updated_at)->None:
         pass

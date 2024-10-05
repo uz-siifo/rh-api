@@ -1,9 +1,6 @@
-import sys
+from .model import model as BaseModel
 
-sys.path.append('/sistema-rh-api/model/') 
-from model import model
-
-class user(model):
+class user(BaseModel):
     def __init__(self, name, nickname, email, passwd, contact, updated_at) -> None:
         super().__init__()
         self.name = name

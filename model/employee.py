@@ -1,9 +1,6 @@
-import sys
+from .model import model as BaseModel
 
-sys.path.append('/sistema-rh-api/model/') 
-from model import model
-
-class employee(model):
+class employee(BaseModel):
     def __init__(self, nuit, identity_card, salary, date_admission, academic_level, updated_at, department_name) -> None:
         self.nuit = nuit
         self.identity_card = identity_card

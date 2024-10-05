@@ -1,9 +1,6 @@
-import sys
+from .model import model as BaseModel
 
-sys.path.append('/sistema-rh-api/model/') 
-from model import model
-
-class goal(model):
+class goal(BaseModel):
     def __init__(self, description, start_date, end_date, conclusion_date, updated_at, employee_id)->None:
         self.description = description
         self.start_date = start_date
