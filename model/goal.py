@@ -1,35 +1,19 @@
-from .model import model as BaseModel
+from .model import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Column, Integer, Text, DateTime, BigInteger, ForeignKey, func 
+)
 
-class Goal(BaseModel):
-    def __init__(self, description, start_date, conclusion_date, end_date, employee_id, updated_at=None) -> None:
-        super().__init__()
-        self.description = description
-        self.start_date = start_date
-        self.conclusion_date = conclusion_date
-        self.end_date = end_date
-        self.employee_id = employee_id
-        self.updated_at = updated_at
+class Goals(Base):
+    __tablename__ = 'goals'
 
-    def to_json(self):
-        return {
-            "description": self.description,
-            "start_date": self.start_date,
-            "conclusion_date": self.conclusion_date,
-            "end_date": self.end_date,
-            "employee_id": self.employee_id,
-            "updated_at": self.updated_at
-        }
-
-    @classmethod
-    def from_json(cls, goal_data):
-        try:
-            return cls(
-                goal_data.get("description"),
-                goal_data.get("start_date"),
-                goal_data.get("conclusion_date"),
-                goal_data.get("end_date"),
-                goal_data.get("employee_id"),
-                goal_data.get("updated_at")
-            )
-        except Exception as e:
-            print(f"Error: {e}")
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    description = Column(Text, nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    conclusion_date = Column(DateTime, nullable=False)
+    end_date = Column(DateTime, nullable=False)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    employee = relationship("Employee")

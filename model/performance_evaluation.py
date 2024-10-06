@@ -1,34 +1,21 @@
-from .model import model as BaseModel
+from .model import Base
+from sqlalchemy.orm import relationship
+from utils.enums import FeedbackEnum
+from sqlalchemy import (
+    Column, Integer, ForeignKey, BigInteger, Enum, DateTime, func 
+)
 
-class PerformanceEvaluation(BaseModel):
-    def __init__(self, employee_id, employee_rating_id, employee_goals_id, feedback, updated_at=None):
-        super().__init__()
-        self.employee_id = employee_id
-        self.employee_rating_id = employee_rating_id
-        self.employee_goals_id = employee_goals_id
-        self.feedback = feedback
-        self.updated_at = updated_at
+class PerformanceEvaluation(Base):
+    __tablename__ = 'performance_evaluation'
 
-    def to_json(self):
-        return {
-            "employee_id": self.employee_id,
-            "employee_rating_id": self.employee_rating_id,
-            "employee_goals_id": self.employee_goals_id,
-            "feedback": self.feedback,
-            "updated_at": self.updated_at
-        }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    employee_rating_id = Column(BigInteger, ForeignKey('employee_rating.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    employee_goals_id = Column(BigInteger, ForeignKey('goals.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    feedback = Column(Enum(FeedbackEnum), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    @classmethod
-    def from_json(cls, __performance_evaluation):
-        try:
-            return cls(
-                employee_id=__performance_evaluation["employee_id"],
-                employee_rating_id=__performance_evaluation["employee_rating_id"],
-                employee_goals_id=__performance_evaluation["employee_goals_id"],
-                feedback=__performance_evaluation["feedback"],
-                updated_at=__performance_evaluation.get("updated_at")  # Usar get para evitar KeyError
-            )
-        except KeyError as e:
-            print(e)
-        except Exception as e:
-            print(e)
+    employee = relationship("Employee")
+    employee_rating = relationship("EmployeeRating")
+    employee_goals = relationship("Goals")

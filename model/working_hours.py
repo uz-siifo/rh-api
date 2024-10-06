@@ -1,29 +1,17 @@
-from .model import model as BaseModel
+from .model import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Column, Integer, DateTime, BigInteger, ForeignKey, func 
+)
 
-class WorkingHours(BaseModel):
-    def __init__(self, normal_hours=0, overtime=0, employee_id=None, updated_at=None) -> None:
-        super().__init__()
-        self.normal_hours = normal_hours
-        self.overtime = overtime
-        self.employee_id = employee_id
-        self.updated_at = updated_at
+class WorkingHours(Base):
+    __tablename__ = 'working_hours'
 
-    def to_json(self):
-        return {
-            "normal_hours": self.normal_hours,
-            "overtime": self.overtime,
-            "employee_id": self.employee_id,
-            "updated_at": self.updated_at
-        }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    normal_hours = Column(Integer, nullable=False, default=0)
+    overtime = Column(Integer, nullable=False, default=0)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    @classmethod
-    def from_json(cls, working_hours_data):
-        try:
-            return cls(
-                working_hours_data.get("normal_hours", 0),
-                working_hours_data.get("overtime", 0),
-                working_hours_data.get("employee_id"),
-                working_hours_data.get("updated_at")
-            )
-        except Exception as e:
-            print(f"Error: {e}")
+    employee = relationship("Employee")

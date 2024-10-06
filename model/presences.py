@@ -1,26 +1,17 @@
-from .model import model as BaseModel
+from .model import Base
+from sqlalchemy.orm import relationship
+from sqlalchemy import (
+    Column, Integer, ForeignKey, BigInteger, DateTime, func 
+)
 
-class Presence(BaseModel):
-    def __init__(self, employee_id, month_records_id, updated_at=None) -> None:
-        super().__init__()
-        self.employee_id = employee_id
-        self.month_records_id = month_records_id
-        self.updated_at = updated_at
+class Presences(Base):
+    __tablename__ = 'presences'
 
-    def to_json(self):
-        return {
-            "employee_id": self.employee_id,
-            "month_records_id": self.month_records_id,
-            "updated_at": self.updated_at
-        }
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    month_records_id = Column(BigInteger, ForeignKey('month_records.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    @classmethod
-    def from_json(cls, presence_data):
-        try:
-            return cls(
-                presence_data.get("employee_id"),
-                presence_data.get("month_records_id"),
-                presence_data.get("updated_at")
-            )
-        except Exception as e:
-            print(f"Error: {e}")
+    employee = relationship("Employee")
+    month_record = relationship("MonthRecords")

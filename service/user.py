@@ -1,11 +1,10 @@
 from db.connect import conn, cur
+from model.user import User
 
-class user_service:
-    def create(self):
-        cur.execute("select* from department;")
-        res = cur.fetchone()
-        print(res)
-        # conn.e
+class UserService:
+    def create(self, user):
+        # new_user = User.from_json(user).to_json()
+        # if ():
         pass
 
     def update(self, user):
