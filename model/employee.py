@@ -1,5 +1,7 @@
 from .model import Base
 from utils.enums import PositionAtWorkEnum
+from sqlalchemy.orm import relationship
+
 from sqlalchemy import (
     Column, Integer, BigInteger, Float, String,ForeignKey, Enum, DateTime, func 
 )
@@ -13,7 +15,10 @@ class Employee(Base):
     identity_card_bi = Column(String(255), nullable=False)
     salary = Column(Float, nullable=False, default=0)
     date_admission = Column(DateTime, nullable=False)
-    department_id = Column(BigInteger, ForeignKey('department.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     academic_level = Column(String(255), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    department_id = Column(BigInteger, ForeignKey('department.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    department = relationship("Department", back_populates="employees")
+    rating = relationship("EmployeeRating", back_populates="employee")

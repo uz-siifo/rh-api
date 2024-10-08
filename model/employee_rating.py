@@ -4,7 +4,6 @@ from sqlalchemy import (
     Column, Integer, ForeignKey, BigInteger, Boolean, DateTime, func 
 )
 
-
 class EmployeeRating(Base):
     __tablename__ = 'employee_rating'
 
@@ -22,4 +21,4 @@ class EmployeeRating(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    employee = relationship("Employee")
+    employee = relationship("Employee", back_populates="rating")
