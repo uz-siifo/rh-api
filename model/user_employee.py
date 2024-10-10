@@ -13,7 +13,24 @@ class UserEmployee(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())
 
-    __table_args__ = (UniqueConstraint('user_id', 'employee_id', name='user_employee_user_id_employee_id_key'),)
+    # __table_args__ = (UniqueConstraint('user_id', 'employee_id', name='user_employee_user_id_employee_id_key'),)
 
-    user = relationship("User")
-    employee = relationship("Employee")
+    # user = relationship("User", back_populates="employee")
+    # employee = relationship("Employee", back_populates="user")
+
+    @classmethod
+    def to_model(cls, data):
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            employee_id=data.get('employee_id')
+        )
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'employee_id': self.employee_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }

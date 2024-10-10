@@ -22,3 +22,36 @@ class EmployeeRating(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee", back_populates="rating")
+
+    @classmethod
+    def to_model(cls, data):
+        return cls(
+            id=data.get('id'),
+            is_assiduous=data.get('is_assiduous', False),
+            is_collaborative=data.get('is_collaborative', False),
+            completed_goals=data.get('completed_goals', 0),
+            is_punctual=data.get('is_punctual', False),
+            work_quality_rating=data.get('work_quality_rating', 0),
+            problem_solving_skills_rating=data.get('problem_solving_skills_rating', 0),
+            communication_skills_rating=data.get('communication_skills_rating', 0),
+            time_management_skills_rating=data.get('time_management_skills_rating', 0),
+            leadership_skills_rating=data.get('leadership_skills_rating', 0),
+            employee_id=data.get('employee_id')
+        )
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'is_assiduous': self.is_assiduous,
+            'is_collaborative': self.is_collaborative,
+            'completed_goals': self.completed_goals,
+            'is_punctual': self.is_punctual,
+            'work_quality_rating': self.work_quality_rating,
+            'problem_solving_skills_rating': self.problem_solving_skills_rating,
+            'communication_skills_rating': self.communication_skills_rating,
+            'time_management_skills_rating': self.time_management_skills_rating,
+            'leadership_skills_rating': self.leadership_skills_rating,
+            'employee_id': self.employee_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }

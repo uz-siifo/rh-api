@@ -14,3 +14,20 @@ class UserContact(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     user = relationship("User", back_populates="contacts")
+
+    @classmethod
+    def to_model(cls, data):
+        return cls(
+            id=data.get('id'),
+            user_id=data.get('user_id'),
+            contact=data.get('contact')
+        )
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'contact': self.contact,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }

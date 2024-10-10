@@ -13,26 +13,34 @@ class UserService(Service):
     def create(self, data):
         try:
             with Session(self.engine) as session:
-                new_user = User(
-                    name = data.get('name'),
-                    nickname = data.get('nickname'),
-                    email = data.get('email'),
-                    passwd = data.get('passwd'),
-                    access_level = data.get('access_level')
-                )
-
+                # new_user = User(
+                #     name = data.get('name'),
+                #     nickname = data.get('nickname'),
+                #     email = data.get('email'),
+                #     passwd = data.get('passwd'),
+                #     access_level = data.get('access_level')
+                # )
+                new_user = User.to_model(data)
                 contact = UserContact(contact=data.get('contact'))
                 new_user.contacts = [contact]
 
                 session.add(new_user)
                 session.commit()
-                return {"OK"}
+                return "OK"
         except Exception as e:
             return str(e)           
 
     def update(self, data):
+        from sqlalchemy import update
         with Session(self.engine) as session:
-            pass
+            stmt = (
+                update(User)
+                .where(User.id == data.get('id'))
+                .values(contact = data.get('contact'))
+            )
+            session.execute(stmt)
+            session.commit()
+            return "OK"
 
     def delete(self, data):
         with Session(self.engine) as session:
@@ -49,28 +57,23 @@ class UserService(Service):
             for row in result:
                 user = row.tuple()[0]
 
-                users.append({
-                    "id": user.id,
-                    "name": user.name,
-                    "nickname": user.nickname,
-                    "email": user.email,
-                    "passwd": user.passwd,
-                    "access_level": user.access_level,
-                    "created_at": user.created_at,
-                    "updated_at": user.updated_at
-                })
+                users.append(user.to_json())
 
             return users
         
     def get_by_id(self, data):
         with Session(self.engine) as session:
-            return session.scalar(
+            user = session.scalar(
                 select(User).where(User.id == data.get('id'))
             )
+
+            return user.to_json()
 
     def get_by_name(self, data):
         with Session(self.engine) as session:
             from sqlalchemy import Select
-            return session.scalar(
+            user = session.scalar(
                 Select(User).where(User.name == data.get('name'))
             )
+
+            return user.to_json() 

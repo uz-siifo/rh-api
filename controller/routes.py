@@ -15,6 +15,9 @@ async def create_user(request: Request):
 
 @routes.get("/get/users/")
 async def read_all_users():
+    from service.user import UserService
+    from service.employee import Employee
+    from service.user_employee import UserEmployeeService
     service = UserService(engine)
     users = service.get_all()
-    return users
+    return {"users": users}

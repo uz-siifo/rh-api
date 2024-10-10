@@ -10,23 +10,21 @@ class EmployeeService(Service):
     def create(self, data):
         
         with Session(self.engine) as session:
-            employee = Employee(
-                nuit = data.get('nuit'),
-                identity_card_bi = data.get('identity_card_bi'),
-                salary = data.get('salary'),
-                data_admission = data.get('data_admission'),
-                department_id = data.get('department_id'),
-                academic_level = data.get('academic_level')
-            )
 
-            session.add(employee)
+            session.add(Employee.to_model(data))
             session.commit()
-
-
             return {"OK"}
 
     def update(self, data):
-        pass
+        from sqlalchemy import update
+        with Session(self.engine) as session:
+            new_employee = Employee.to_model(data)
+            session.query(Employee).filter(Employee.id == data.get('id')).update(
+                new_employee.to_json()
+            )
+
+            session.commit()
+            return "OK"
 
     def delete(self, data):
         pass
@@ -41,16 +39,6 @@ class EmployeeService(Service):
 
             for row in result:
                 employee = row.tuple()[0]
-                employees.append({
-                    "name": "employee_name",
-                    "nickname": "employee_nickname",
-                    "nuit": employee.nuit,
-                    "identity_card_bi": employee.identity_card_bi,
-                    "position_at_work": employee.position_at_work,
-                    "date_admission": employee.date_admission,
-                    "department_id": employee.department_id,
-                    "academic_level": employee.academic_level, 
-                    "salary": employee.salary,
-                    "created_at": employee.created_at,
-                    "updated_at": employee.updated_at
-                })
+                employees.append(employee.to_json())
+
+            return employees

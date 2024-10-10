@@ -15,3 +15,20 @@ class Presences(Base):
 
     employee = relationship("Employee")
     month_record = relationship("MonthRecords")
+
+    @classmethod
+    def to_model(cls, data):
+        return cls(
+            id=data.get('id'),
+            employee_id=data.get('employee_id'),
+            month_records_id=data.get('month_records_id')
+        )
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'employee_id': self.employee_id,
+            'month_records_id': self.month_records_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
