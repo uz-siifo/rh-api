@@ -89,17 +89,6 @@ print(user_service.get_all())
 
 # print(res)
 
-# res = user_service.create({
-#     "name": "Rene Descartes",
-#     "nickname": "Muala",
-#     "email": "rende.muala@icloud.com",
-#     "passwd": "10134456",
-#     "access_level": 'user',
-#     "contact": "+258831780781"
-# })
-
-# print(res)
-
 # with Session(engine) as session:
 #     result = session.scalar(
 #         select(Department)
