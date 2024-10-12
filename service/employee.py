@@ -1,44 +1,63 @@
 from .service import Service
-from sqlalchemy import select
+from sqlalchemy import select, update, delete, or_
 from sqlalchemy.orm import Session
-from model.employee import Employee
+from model.models import Employee
 
 class EmployeeService(Service):
     def __init__(self, engine) -> None:
         super().__init__(engine)
 
     def create(self, data):
-        
-        with Session(self.engine) as session:
-
-            session.add(Employee.to_model(data))
-            session.commit()
-            return {"OK"}
+        try:
+            with Session(self.engine) as session:
+                new_employee = Employee.to_model(data)
+                session.add(new_employee)
+                session.commit()
+                return "Employee created successfully"
+        except Exception as e:
+            return f"Error creating employee: {str(e)}"
 
     def update(self, data):
-        from sqlalchemy import update
-        with Session(self.engine) as session:
-            new_employee = Employee.to_model(data)
-            session.query(Employee).filter(Employee.id == data.get('id')).update(
-                new_employee.to_json()
-            )
-
-            session.commit()
-            return "OK"
+        try:
+            with Session(self.engine) as session:
+                stmt = (
+                    update(Employee)
+                    .where(Employee.id == data.get('id'))
+                    .values(
+                        name=data.get('name'),
+                        identity_card_bi=data.get('identity_card_bi'),
+                        position=data.get('position'),
+                        department=data.get('department')
+                    )
+                )
+                session.execute(stmt)
+                session.commit()
+                return "Employee updated successfully"
+        except Exception as e:
+            return f"Error updating employee: {str(e)}"
 
     def delete(self, data):
-        pass
+        try:
+            with Session(self.engine) as session:
+                query = delete(Employee).where(
+                    or_(
+                        Employee.id == data.get('id'),
+                        Employee.identity_card_bi.like(data.get('identity_card_bi'))
+                    )
+                )
+                session.execute(query)
+                session.commit()
+                return "Employee deleted successfully"
+        except Exception as e:
+            return f"Error deleting employee: {str(e)}"
 
     def get_all(self):
-        with Session(self.engine) as session:
-            from sqlalchemy import Select
-            query = Select(Employee)
-            result = session.execute(query).fetchall()
+        try:
+            with Session(self.engine) as session:
+                query = select(Employee)
+                result = session.execute(query).scalars().all()
 
-            employees = []
-
-            for row in result:
-                employee = row.tuple()[0]
-                employees.append(employee.to_json())
-
-            return employees
+                employees = [employee.to_json() for employee in result]
+                return employees
+        except Exception as e:
+            return f"Error fetching employees: {str(e)}"

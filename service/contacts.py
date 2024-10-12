@@ -1,5 +1,5 @@
 from .service import Service
-from model.user_contact import UserContact
+from model.models import UserContact
 from sqlalchemy.orm import Session
 
 class ContactService(Service):

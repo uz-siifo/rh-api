@@ -1,9 +1,7 @@
-# from db.connect import conn, cur
 from .service import Service
-from model.user import User
+from model.models import User, UserContact
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from model.user_contact import UserContact
 
 class UserService(Service):
 
@@ -13,13 +11,6 @@ class UserService(Service):
     def create(self, data):
         try:
             with Session(self.engine) as session:
-                # new_user = User(
-                #     name = data.get('name'),
-                #     nickname = data.get('nickname'),
-                #     email = data.get('email'),
-                #     passwd = data.get('passwd'),
-                #     access_level = data.get('access_level')
-                # )
                 new_user = User.to_model(data)
                 contact = UserContact(contact=data.get('contact'))
                 new_user.contacts = [contact]
@@ -43,13 +34,23 @@ class UserService(Service):
             return "OK"
 
     def delete(self, data):
+        from sqlalchemy import delete, or_
         with Session(self.engine) as session:
-           pass 
+            query = delete(User).where(
+                or_(
+                    User.id == data.get('id'), 
+                    User.email.like(data.get('email')),
+                )
+            )
+
+            session.execute(query)
+            session.commit()
+            return "OK"
 
     def get_all(self):
         with Session(self.engine) as session:
-            from sqlalchemy import Select
-            query = Select(User)
+            from sqlalchemy import select
+            query = select(User)
 
             result = session.execute(query).fetchall()
             users = []

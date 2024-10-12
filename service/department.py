@@ -1,6 +1,6 @@
 from service.service import Service
 from sqlalchemy.orm import Session
-from model.department import Department
+from model.models import Department
 
 class DepartmentService(Service):
     def __init__(self, engine) -> None:
@@ -21,8 +21,15 @@ class DepartmentService(Service):
             return "OK"
     
     def update(self, data):
+        from sqlalchemy import update
         with Session(self.engine) as session:
-            pass
+            new_department = Department.to_model(data)
+            session.query(Department).filter(Department.id == data.get('id')).update(
+                new_department.to_json()
+            )
+
+            session.commit()
+            return "OK"
     
     def get_all(self):
         with Session(self.engine) as session:

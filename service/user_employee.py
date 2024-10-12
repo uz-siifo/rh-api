@@ -1,6 +1,6 @@
 from .service import Service
 from sqlalchemy.orm import Session
-from model.user_employee import UserEmployee
+from model.models import UserEmployee
 
 class UserEmployeeService(Service):
     def __init__(self, engine) -> None:
@@ -36,3 +36,26 @@ class UserEmployeeService(Service):
                 user_employees.append(user_employee.to_json())
             
             return user_employees
+        
+    def get_all_employee(self):
+        with Session(self.engine) as session:
+            from sqlalchemy import select, and_
+            from model.models import User, Employee, Department
+            query = select(
+                User.name, 
+                User.nickname, 
+                User.email,  
+                Employee.identity_card_bi, 
+                Employee.nuit,
+                Department.name,
+                Employee.position_at_work
+            ).where(
+                and_(
+                    User.id == UserEmployee.user_id,
+                    Employee.id == UserEmployee.employee_id
+                )
+            )
+
+            employee = session.execute(query).fetchone()
+
+            return employee
