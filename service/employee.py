@@ -12,6 +12,7 @@ class EmployeeService(Service):
             with Session(self.engine) as session:
                 new_employee = Employee.to_model(data)
                 session.add(new_employee)
+
                 session.commit()
                 return "Employee created successfully"
         except Exception as e:
@@ -54,10 +55,34 @@ class EmployeeService(Service):
     def get_all(self):
         try:
             with Session(self.engine) as session:
-                query = select(Employee)
-                result = session.execute(query).scalars().all()
+                from model.models import User, UserEmployee
+                from sqlalchemy import and_
+                query = select(
+                    User.name, User.nickname, User.email, 
+                    Employee
+                ).where(
+                    and_(
+                        UserEmployee.employee_id == Employee.id,
+                        UserEmployee.user_id == User.id
+                    )
+                )
 
-                employees = [employee.to_json() for employee in result]
+                result = session.execute(query).fetchall()
+                employees = []
+
+                for row in result:
+                    employee = row.tuple()
+
+                    employees.append({
+                        "name": employee[0],
+                        "nickname": employee[1],
+                        "email": employee[2],
+                        "employee": employee[3]
+                    })
+
+                # result = session.execute(query).scalars().all()
+
+                # employees = [employee.to_json() for employee in result] 
                 return employees
         except Exception as e:
             return f"Error fetching employees: {str(e)}"

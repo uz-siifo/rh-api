@@ -3,6 +3,19 @@ from sqlalchemy.orm import Session
 from model.models import UserEmployee
 
 class UserEmployeeService(Service):
+    """
+    Servico para manipulacao de usuarios empregados.
+
+    Metodos:
+    - create(data): Cria um novo usuario empregado e adiciona ao banco de dados.
+    - delete(data): Remove um usuario empregado do banco de dados.
+    - update(data): Atualiza os dados de um usuario empregado existente.
+    - get_all(): Retorna todos os usuarios empregados cadastrados.
+    - get_all_employee(): Retorna informacoes detalhadas de todos os empregados.
+
+    Atributos:
+    - engine: Instancia do banco de dados utilizada para realizar as operacoes.
+    """
     def __init__(self, engine) -> None:
         super().__init__(engine)
 
@@ -47,7 +60,7 @@ class UserEmployeeService(Service):
                 User.email,  
                 Employee.identity_card_bi, 
                 Employee.nuit,
-                Department.name,
+                # Department.name,
                 Employee.position_at_work
             ).where(
                 and_(

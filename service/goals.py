@@ -62,3 +62,28 @@ class GoalsService(Service):
                 return goals
         except Exception as e:
             return f"Error fetching goals: {str(e)}"
+    
+    def get_completed_goals_by_employee(self, data):
+        with Session(self.engine) as session:
+            from sqlalchemy import select, and_
+            from utils.enums import GoalStatusEnum
+            query = select(Goals).where(
+                and_(
+                    Goals.employee_id == data.get("employee_id"),
+                    Goals.status == GoalStatusEnum.completed
+                )
+            )
+
+            result = session.execute(query).fetchall()
+            goals = []
+            for row in result:
+                goal = row.tuple()[0]
+                goals.append(goal.to_json())
+
+            return goals
+
+            # goals_num = 0
+            # for row in goals:
+            #     goals_num += 1
+
+            # return goals_num

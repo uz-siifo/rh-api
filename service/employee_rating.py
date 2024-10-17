@@ -11,7 +11,14 @@ class EmployeeRatingService(Service):
     def create(self, data):
         try:
             with Session(self.engine) as session:
+                from .goals import GoalsService
+                goals_service = GoalsService(self.engine)
                 new_rating = EmployeeRating.to_model(data)
+                new_rating.completed_goals = len(
+                    goals_service.get_completed_goals_by_employee({
+                        "employee_id": new_rating.employee_id
+                    })
+                )
                 session.add(new_rating)
                 session.commit()
                 return "Rating created successfully"
@@ -22,13 +29,15 @@ class EmployeeRatingService(Service):
         from sqlalchemy import update
         try:
             with Session(self.engine) as session:
+                from .goals import GoalsService
+                goals_service = GoalsService(self.engine)
                 stmt = (
                     update(EmployeeRating)
                     .where(EmployeeRating.id == data.get('id'))
                     .values(
                         is_assiduous=data.get('is_assiduous', False),
                         is_collaborative=data.get('is_collaborative', False),
-                        completed_goals=data.get('completed_goals', 0),
+                        completed_goals= len(goals_service.get_completed_goals_by_employee({"employee_id": data.get("employee_id")})),
                         is_punctual=data.get('is_punctual', False),
                         work_quality_rating=data.get('work_quality_rating', 0),
                         problem_solving_skills_rating=data.get('problem_solving_skills_rating', 0),

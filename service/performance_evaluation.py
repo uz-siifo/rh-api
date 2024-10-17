@@ -58,3 +58,15 @@ class PerformanceEvaluationService(Service):
                 return evaluations
         except Exception as e:
             return f"Error fetching performance evaluations: {str(e)}"
+        
+    def get_by_employee(self, data):
+        try:
+            with Session(self.engine) as session:
+                from sqlalchemy import select
+                query = select(PerformanceEvaluation).where(PerformanceEvaluation.employee_id == data.get("employee_id"))
+                result = session.execute(query).fetchall()
+                return result
+
+        except Exception as e:
+            return f"Error fetching performance evaluations: {str(e)}"
+
