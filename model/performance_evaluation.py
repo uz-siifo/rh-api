@@ -19,8 +19,7 @@ class PerformanceEvaluation(Base):
     employee = relationship("Employee")
     employee_rating = relationship("EmployeeRating")
     employee_goals = relationship("Goals")
-
-
+    
     @classmethod
     def to_model(cls, data):
         return cls(

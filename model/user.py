@@ -18,7 +18,7 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    contacts = relationship("UserContact", back_populates="user") 
+    contacts = relationship("UserContact", back_populates="user", cascade="all, delete", passive_deletes=True) 
     employees = relationship("Employee", secondary="user_employee", back_populates="users") 
 
     @classmethod

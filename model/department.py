@@ -1,4 +1,4 @@
-from .model import Base
+from .model import Base, engine
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     Column, Integer, BigInteger, Float, String, DateTime, func 
@@ -37,3 +37,5 @@ class Department(Base):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+    
+Base.metadata.create_all(engine)
