@@ -32,7 +32,8 @@ working_hours_service = WorkingHoursService(engine)
 #     "name": "Eloide Simao",
 #     "nickname": "Novela",
 #     "email": "eloide.novela@outlook.com",
-#     "passwd": "1013eloide.novela",
+#     "passwd": "10134456",
+#     "username": "eloide-novela",
 #     "access_level": "admin",
 #     "contact": "+258876545335"
 # }))
@@ -49,13 +50,35 @@ working_hours_service = WorkingHoursService(engine)
 # }))
 
 print("user_serive: ", user_service.get_all(), "\n\n\n")
-print("employee_service: ", employee_service.get_all(), "\n\n\n")
-print("contact_service: ", contact_service.get_all(), "\n\n\n")
-print("department_service: ", department_service.get_all(), "\n\n\n")
-print("employee_rating_service: ", employee_rating_service.get_all(), "\n\n\n")
-print("goals_service: ", goals_service.get_all(), "\n\n\n")
-print("month_records_service: ", month_records_service.get_all(), "\n\n\n")
-print("performance_evaluation_service: ", performance_evaluation_service.get_all(), "\n\n\n")
-print("presences_service: ", presences_service.get_all(), "\n\n\n")
-print("user_employee_service: ", user_employee_service.get_all_employee(), "\n\n\n")
-print("working_hours_service: ", working_hours_service.get_all(), "\n\n\n")
+
+# print(user_service.is_admin("eloide-novela"))
+# print(user_service.create({
+#      "name": "Eloide Simao",
+#      "username": "eloide-novela",
+#      "nickname": "Novela",
+#     "email": "eloide.novela@outlook.com",
+#     "passwd": "1013eloide.novela",
+#     "access_level": "admin",
+#     "contact": "+258876545335"
+# }))
+
+# print("employee_service: ", employee_service.get_all(), "\n\n\n")
+# print("contact_service: ", contact_service.get_all(), "\n\n\n")
+# print("department_service: ", department_service.get_all(), "\n\n\n")
+# print("employee_rating_service: ", employee_rating_service.get_all(), "\n\n\n")
+# print("goals_service: ", goals_service.get_all(), "\n\n\n")
+# print("month_records_service: ", month_records_service.get_all(), "\n\n\n")
+# print("performance_evaluation_service: ", performance_evaluation_service.get_all(), "\n\n\n")
+# print("presences_service: ", presences_service.get_all(), "\n\n\n")
+# print("user_employee_service: ", user_employee_service.get_all_employee(), "\n\n\n")
+# print("working_hours_service: ", working_hours_service.get_all(), "\n\n\n")
+
+# # print(user_service.is_user({
+# #     "username": "eloide-novela",
+# #     "passwd": "1013eloide.novela"
+# # }))
+# # from model.models import *
+
+# # print(goals_service.get_completed_goals_by_employee({
+# #     "employee_id": 1
+# # }))
