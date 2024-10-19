@@ -1,6 +1,7 @@
 from .service import Service
 from model.models import UserContact
 from sqlalchemy.orm import Session
+from utils.util import util
 
 class ContactService(Service):
     def __init__(self, engine) -> None:
@@ -25,7 +26,10 @@ class ContactService(Service):
         from sqlalchemy import delete, or_
         with Session(self.engine) as session:
             query = delete(UserContact).where(
-                or_(UserContact.id == data.get('id'), UserContact.contact.like(data.get('contact')))
+                or_(
+                    UserContact.id == data.get('id'), 
+                    UserContact.contact.like(data.get('contact'))
+                )
             )
             session.execute(query)
             session.commit()

@@ -23,6 +23,8 @@ presences_service = PresencesService(engine)
 user_employee_service = UserEmployeeService(engine)
 working_hours_service = WorkingHoursService(engine)
 
+print(department_service.get_by_id({"id": 1}))
+
 # print(user_employee_service.create({
 #     "user_id": 3,
 #     "employee_id": 1
@@ -49,7 +51,7 @@ working_hours_service = WorkingHoursService(engine)
 #     'department_id': 1
 # }))
 
-print("user_serive: ", user_service.get_all(), "\n\n\n")
+# print("user_serive: ", user_service.get_all(), "\n\n\n")
 
 # print(user_service.is_admin("eloide-novela"))
 # print(user_service.create({

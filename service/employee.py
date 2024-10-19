@@ -86,3 +86,29 @@ class EmployeeService(Service):
                 return employees
         except Exception as e:
             return f"Error fetching employees: {str(e)}"
+        
+    def get_all_by_department(self, data):
+        try:
+            with Session(self.engine) as session:
+                from sqlalchemy import select, or_
+                from model.models import Department
+
+                query = select(Department).where(
+                    or_(
+                        Employee.department_id == data.get("department_id"),
+                        Department.name.ilike(data.get("name"))
+                    )
+                )
+                
+                result = session.execute(query).fetchall()
+
+                employees = []
+
+                for row in result:
+                    employee = row.tuple()[0]
+
+                    employees.append(employee.to_json())
+
+                return employees
+        except Exception as e:
+            return str(e)

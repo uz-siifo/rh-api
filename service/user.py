@@ -28,13 +28,16 @@ class UserService(Service):
     def create(self, data):
         try:
             with Session(self.engine) as session:
-                new_user = User.to_model(data)
-                contact = UserContact(contact=data.get('contact'))
-                new_user.contacts = [contact]
+                from utils.util import util
+                if (util.is_email(data.get("email"))):
+                    new_user = User.to_model(data)
+                    contact = UserContact(contact=data.get('contact'))
+                    new_user.contacts = [contact]
 
-                session.add(new_user)
-                session.commit()
-                return "OK"
+                    session.add(new_user)
+                    session.commit()
+                    return "OK"
+                
         except Exception as e:
             return str(e)           
 

@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 
 import os
 SECRET_KEY = os.getenv("SECRET_KEY", "sifo-senha-secreta")  # Obtendo a chave secreta do ambiente ou usando uma padrao
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 ALGORITHM = "HS256"  # Algoritmo usado para codificacao JWT
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # Tempo de expiracao do token

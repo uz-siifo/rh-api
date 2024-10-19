@@ -45,6 +45,17 @@ class DepartmentService(Service):
                 departments.append(department.to_json())
 
             return departments
+        
+    def get_by_id(self, data):
+        try:
+            with Session(self.engine) as session:
+                from sqlalchemy import select
+                query = select(Department).where(Department.id == data.get("id"))
+                department = session.execute(query).fetchone().tuple()[0]
+                return department.to_json()
+             
+        except Exception as e:
+            return str(e)
     
     def get_all_by_employee(self, data):
         with Session(self.engine) as session:
