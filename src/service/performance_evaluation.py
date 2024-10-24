@@ -13,7 +13,7 @@ class PerformanceEvaluationService(Service):
                 new_evaluation = PerformanceEvaluation.to_model(data)
                 session.add(new_evaluation)
                 session.commit()
-                return "Performance evaluation created successfully"
+                return new_evaluation.to_json()
         except Exception as e:
             return f"Error creating performance evaluation: {str(e)}"
 

@@ -7,6 +7,7 @@ from api.routes.presence_routes import presences_router
 from api.routes.rating_routes import rating_router
 from api.routes.user_employee_routes import user_employee_router
 from api.routes.department_routes import department_router
+from api.routes.employee_routes import employee_router
 
 from fastapi import FastAPI
 
@@ -22,3 +23,4 @@ app.include_router(presences_router)
 app.include_router(month_records_router)
 app.include_router(performance_evaluation_router)
 app.include_router(department_router)
+app.include_router(employee_router)

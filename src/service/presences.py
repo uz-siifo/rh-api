@@ -13,7 +13,7 @@ class PresencesService(Service):
                 new_presence = Presences.to_model(data)
                 session.add(new_presence)
                 session.commit()
-                return "Presence record created successfully"
+                return new_presence.to_json()
         except Exception as e:
             return f"Error creating presence record: {str(e)}"
 

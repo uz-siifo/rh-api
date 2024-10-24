@@ -11,14 +11,11 @@ class ContactService(Service):
         from utils.util import util
         if (util.is_contact(data.get('contact'))):
             with Session(self.engine) as session:
-                # contact = UserContact(
-                #     user_id = data.get('user_id'),
-                #     contact = data.get('contact')
-                # )
 
-                session.add(UserContact.to_model(data))
+                new_contact = UserContact.to_model(data)
+                session.add(new_contact)
                 session.commit()
-                return "OK"
+                return new_contact.to_json()
                 
         return "Contacto Invalido!"
             

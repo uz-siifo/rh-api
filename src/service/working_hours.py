@@ -13,7 +13,7 @@ class WorkingHoursService(Service):
                 new_working_hours = WorkingHours.to_model(data)
                 session.add(new_working_hours)
                 session.commit()
-                return "Working hours record created successfully"
+                return new_working_hours.to_json()
         except Exception as e:
             return f"Error creating working hours record: {str(e)}"
 

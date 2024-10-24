@@ -3,7 +3,7 @@ from typing import List
 from service.department import DepartmentService
 from model.models import engine
 from auth.auth_service import get_current_admin  # Funcao para verificar se o usuario é um gestor/gerente
-from base_models.models import DepartmentData
+from api.base_models.models import DepartmentData
 
 # Definicao da API Router
 department_router = APIRouter()

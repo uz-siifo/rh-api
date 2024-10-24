@@ -13,7 +13,8 @@ class GoalsService(Service):
                 new_goal = Goals.to_model(data)
                 session.add(new_goal)
                 session.commit()
-                return "Goal created successfully"
+                return new_goal.to_json()
+            
         except Exception as e:
             return f"Error creating goal: {str(e)}"
 

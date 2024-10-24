@@ -21,9 +21,11 @@ class UserEmployeeService(Service):
 
     def create(self, data):
         with Session(self.engine) as session:
-            session.add(UserEmployee.to_model(data))
+            user_employee = UserEmployee.to_model(data)
+            session.add(user_employee)
             session.commit()
-            return "OK"
+            return user_employee.to_json()
+        return "Bad"
         
     def delete(self, data):
         from sqlalchemy import delete

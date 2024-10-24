@@ -8,9 +8,11 @@ class DepartmentService(Service):
     
     def create(self, data):
         with Session(self.engine) as session:
-            session.add(Department.to_model(data))
+            new_department = Department.to_model(data)
+            session.add(new_department)
             session.commit()
-            return "OK"
+            return new_department.to_json()
+        return "Bad"
 
     def delete(self, data):
         from sqlalchemy import delete, or_
@@ -29,7 +31,7 @@ class DepartmentService(Service):
             )
 
             session.commit()
-            return "OK"
+            return new_department.to_json()
     
     def get_all(self):
         with Session(self.engine) as session:

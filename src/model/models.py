@@ -55,7 +55,10 @@ class User(Base):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'contacts': [contact.to_json() for contact in self.contacts]
         }
-    
+    @staticmethod
+    def keys(self):
+        return ['id', 'name', 'nickname', 'username', 'email','passwd','access_level','created_at','updated_at', 'contacts']
+
 class Department(Base):
     __tablename__ = 'department'
 
@@ -105,9 +108,11 @@ class Employee(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     department = relationship("Department", back_populates="employees")
-    rating = relationship("EmployeeRating", back_populates="employee")
+    rating = relationship("EmployeeRating", back_populates="employee", cascade="all, delete", passive_deletes=True)
     users = relationship("User", secondary="user_employee", back_populates="employees")
-
+    working_hours = relationship("WorkingHours", back_populates="employee", cascade="all, delete", passive_deletes=True)
+    progressions = relationship("Progression", back_populates="employee", cascade="all, delete", passive_deletes=True)
+    
     @classmethod
     def to_model(cls, data):
         return cls(
@@ -208,7 +213,6 @@ class MonthRecords(Base):
 
     __table_args__ = (UniqueConstraint('month', 'year', name='month_records_month_year_key'),)
 
-
     @classmethod
     def to_model(cls, data):
         return cls(
@@ -243,7 +247,7 @@ class EmployeeRating(Base):
     communication_skills_rating = Column(Integer, nullable=False, default=0)
     time_management_skills_rating = Column(Integer, nullable=False, default=0)
     leadership_skills_rating = Column(Integer, nullable=False, default=0)
-    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="cascade"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -396,7 +400,7 @@ class WorkingHours(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     normal_hours = Column(Integer, nullable=False, default=0)
     overtime = Column(Integer, nullable=False, default=0)
-    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="cascade"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -421,4 +425,31 @@ class WorkingHours(Base):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
     
+class Progression(Base):
+    __tablename__ = "progressions"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="cascade"), nullable=False)
+    description = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    employee = relationship("Employee")
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "employee_id": self.employee_id,
+            "description": self.description,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at
+        }
+
+    @classmethod
+    def to_model(cls, data):
+        return cls(
+            id=data.get("id"),
+            employee_id=data.get("employee_id"),
+            description=data.get("description")
+        )
+
 Base.metadata.create_all(engine)

@@ -36,7 +36,8 @@ class UserService(Service):
 
                     session.add(new_user)
                     session.commit()
-                    return "OK"
+                    
+                    return new_user.to_json()
                 
         except Exception as e:
             return str(e)           
@@ -44,24 +45,36 @@ class UserService(Service):
     def update(self, data):
         from sqlalchemy import update
         with Session(self.engine) as session:
-            stmt = (
-                update(User)
-                .where(User.id == data.get('id'))
-                .values(contact = data.get('contact'))
-            )
-            session.execute(stmt)
-            session.commit()
-            return "OK"
-
+            try:
+                stmt = (
+                    update(User)
+                    .where(User.id == data.get('id'))
+                    .values(nickname = data.get("nickname"))
+                )
+                session.execute(stmt)
+                session.commit()
+                return "OK"
+            except Exception as error:
+                session.rollback()
+                return str(error)
+            
     def delete(self, data):
         from sqlalchemy import delete, or_
         with Session(self.engine) as session:
-            query = delete(User).where(
-                or_(
-                    User.id == data.get('id'), 
-                    User.email.like(data.get('email')),
+            query = None
+            if data.get("email") is not None:
+
+                query = delete(User).where(
+                    or_(
+                        User.email.like(data.get('email')),
+                    )
                 )
-            )
+            elif data.get("id") is not None:
+                query = delete(User).where(
+                    or_(
+                        User.id == data.get('id')
+                    )
+                )
 
             session.execute(query)
             session.commit()

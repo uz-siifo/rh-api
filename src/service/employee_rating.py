@@ -21,7 +21,7 @@ class EmployeeRatingService(Service):
                 )
                 session.add(new_rating)
                 session.commit()
-                return "Rating created successfully"
+                return new_rating.to_json()
         except Exception as e:
             return f"Error creating rating: {str(e)}"
 

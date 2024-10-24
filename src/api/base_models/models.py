@@ -89,3 +89,35 @@ class DepartmentData(BaseModel):
             "min_salary": self.min_salary,
             "max_salary": self.max_salary
         }
+
+
+from datetime import datetime  
+class EmployeeData(BaseModel):
+    name: str
+    identity_card_bi: str
+    nuit: str
+    position: str
+    department: str
+    academic_level: str
+    salary: float
+    date_admission: datetime
+    position_at_work: str
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'position_at_work': self.position_at_work,
+            'nuit': self.nuit,
+            'identity_card_bi': self.identity_card_bi,
+            'salary': self.salary,
+            'date_admission': self.date_admission,
+            'academic_level': self.academic_level,
+            'department_id': self.department
+        }
+
+class UpdateEmployeeData(BaseModel):
+    id: int
+    name: str = None
+    identity_card_bi: str = None
+    position: str = None
+    department: str = None

@@ -1,5 +1,5 @@
 from .service import Service
-from sqlalchemy import select, update, delete, or_
+from sqlalchemy import select, update, delete, or_, insert
 from sqlalchemy.orm import Session
 from model.models import Employee
 
@@ -7,15 +7,54 @@ class EmployeeService(Service):
     def __init__(self, engine) -> None:
         super().__init__(engine)
 
-    def create(self, data):
+    def create(self, employee, user):
+
+        """
+            {
+                "name": "Eloide Simao",
+                "nickname": "Novela",
+                "email": "eloide.novela@outlook.com",
+                "passwd": "87475375",
+                "contact": "98375747837",
+                "access_level": "admin",
+                "positio_at_work": "engineer",
+                "nuit": "834889483",
+                "bi": "48489398398939y111",
+                "salary": 393499889,
+                "admission_date": "2026-11-11",
+                "academic_level": "ddd",
+                "department_id": "1"
+            }
+        """
         try:
             with Session(self.engine) as session:
-                new_employee = Employee.to_model(data)
+                from model.models import User
+                from model.models import UserEmployee
+                from service.user_employee import UserEmployeeService
+                new_employee = Employee.to_model(employee)
+                new_user = User.to_model(user)
                 session.add(new_employee)
-
+                session.add(new_user)
                 session.commit()
-                return "Employee created successfully"
+
+                employee_id = new_employee.to_json().get("id")
+                user_id = new_user.to_json().get("id")
+
+                user_employee_service = UserEmployeeService(self.engine)
+
+                relation = user_employee_service.create({
+                    "user_id": user_id,
+                    "employee_id": employee_id
+                })
+                
+                return {
+                        "employee": new_employee.to_json(),
+                        "user": new_user.to_json(),
+                        "user_employee": relation
+                    }
+            
         except Exception as e:
+            session.rollback()
             return f"Error creating employee: {str(e)}"
 
     def update(self, data):

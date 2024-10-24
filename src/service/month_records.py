@@ -13,7 +13,7 @@ class MonthRecordsService(Service):
                 new_record = MonthRecords.to_model(data)
                 session.add(new_record)
                 session.commit()
-                return "Month record created successfully"
+                return new_record.to_json()
         except Exception as e:
             return f"Error creating month record: {str(e)}"
 
