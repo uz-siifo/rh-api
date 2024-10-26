@@ -56,26 +56,14 @@ class ContactService(Service):
         with Session(self.engine) as session:
             from sqlalchemy import Select
             query = Select(UserContact)
-
-            result = session.execute(query).fetchall()
-            contacts = []
-
-            for row in result:
-                contact = row.tuple()[0]
-                contacts.append(contact.to_json())
-
+            result = session.execute(query).scalars().all()
+            contacts = [contact.to_json() for contact in result]
             return contacts
 
     def get_all_by_user(self, data):
         with Session(self.engine) as session:
             from sqlalchemy import Select
-
             query = Select(UserContact).where(UserContact.user_id == data.get('user_id'))
             result = session.execute(query).fetchall()
-            contacts = []
-
-            for row in result:
-                contact = row.tuple()[0]
-                contacts.append(contact.to_json())
-
+            contacts = [contact.tuple()[0].to_json() for contact in result]
             return contacts

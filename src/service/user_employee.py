@@ -37,19 +37,31 @@ class UserEmployeeService(Service):
 
     def update(self, data):
         with Session(self.engine) as session:
-            pass
+            try:
+                from sqlalchemy import update
+                query = None
+                for key in data.keys():
+                    if (data.get("emloyee_id")):
+                        query = update(UserEmployee).where(
+                            id == data.get("id")
+                        ).values(employee_id = data.get("employee_id"))
+                    elif (data.get("user_id")):
+                        query = update(UserEmployee).where(
+                            id == data.get("id")
+                        ).values(user_id = data.get("user_id"))
+                session.execute(query)
+                session.commit()
+                return "OK"
+            except Exception as error:
+                session.rollback()
+                return str(error)
 
     def get_all(self):
         from sqlalchemy import Select
         with Session(self.engine) as session:
             query = Select(UserEmployee)
-            result = session.execute(query).fetchall()
-            user_employees = []
-
-            for row in result:
-                user_employee = row.tuple()[0]
-                user_employees.append(user_employee.to_json())
-            
+            result = session.execute(query).scalars().all()
+            user_employees = [user_employee.to_json() for user_employee in result]
             return user_employees
         
     def get_all_employee(self):
@@ -71,6 +83,6 @@ class UserEmployeeService(Service):
                 )
             )
 
-            employee = session.execute(query).fetchone()
+            employee = session.execute(query).scalars().one()
 
-            return employee
+            return employee.to_json()

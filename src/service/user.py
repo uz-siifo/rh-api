@@ -85,14 +85,8 @@ class UserService(Service):
             from sqlalchemy import select
             query = select(User)
 
-            result = session.execute(query).fetchall()
-            users = []
-
-            for row in result:
-                user = row.tuple()[0]
-
-                users.append(user.to_json())
-
+            result = session.execute(query).scalars().all()
+            users = [user.to_json() for user in result]
             return users
     
     def is_user(self, data):

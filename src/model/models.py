@@ -5,10 +5,9 @@ from sqlalchemy.types import Enum as PgEnum
 from utils.enums import *
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
-from datetime import datetime
 
 from sqlalchemy import (
-    Column, ForeignKey, UniqueConstraint, Text, Float, BigInteger, Boolean, Integer, String, DateTime, func 
+    Column, ForeignKey, Text, Float, BigInteger, Boolean, Integer, String, DateTime, func 
 )
 
 engine = create_engine(Settings().DATABASE_URL)
@@ -55,9 +54,6 @@ class User(Base):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'contacts': [contact.to_json() for contact in self.contacts]
         }
-    @staticmethod
-    def keys(self):
-        return ['id', 'name', 'nickname', 'username', 'email','passwd','access_level','created_at','updated_at', 'contacts']
 
 class Department(Base):
     __tablename__ = 'department'
@@ -102,6 +98,8 @@ class Employee(Base):
     identity_card_bi = Column(String(255), nullable=False, unique=True)
     salary = Column(Float, nullable=False, default=0)
     date_admission = Column(DateTime, nullable=False)
+    length_of_service = Column(Integer, nullable=True)
+    age = Column(Integer, nullable=True)
     academic_level = Column(String(255), nullable=False)
     department_id = Column(BigInteger, ForeignKey('department.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -109,7 +107,7 @@ class Employee(Base):
 
     department = relationship("Department", back_populates="employees")
     rating = relationship("EmployeeRating", back_populates="employee", cascade="all, delete", passive_deletes=True)
-    users = relationship("User", secondary="user_employee", back_populates="employees")
+    users = relationship("User", secondary="user_employee", back_populates="employees", passive_deletes=True)
     working_hours = relationship("WorkingHours", back_populates="employee", cascade="all, delete", passive_deletes=True)
     progressions = relationship("Progression", back_populates="employee", cascade="all, delete", passive_deletes=True)
     
@@ -145,15 +143,10 @@ class UserEmployee(Base):
     __tablename__ = 'user_employee'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, ForeignKey('user.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
-    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('user.id', onupdate="NO ACTION", ondelete="cascade"), nullable=False)
+    employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="cascade"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, onupdate=func.now())
-
-    # __table_args__ = (UniqueConstraint('user_id', 'employee_id', name='user_employee_user_id_employee_id_key'),)
-
-    # user = relationship("User", back_populates="employee")
-    # employee = relationship("Employee", back_populates="user")
 
     @classmethod
     def to_model(cls, data):
@@ -196,40 +189,6 @@ class UserContact(Base):
             'id': self.id,
             'user_id': self.user_id,
             'contact': self.contact,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
-        }
-    
-class MonthRecords(Base):
-    __tablename__ = 'month_records'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    month = Column(String(255), nullable=False)
-    year = Column(Integer, nullable=False)
-    presences = Column(Integer, nullable=False, default=0)
-    absences = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
-    __table_args__ = (UniqueConstraint('month', 'year', name='month_records_month_year_key'),)
-
-    @classmethod
-    def to_model(cls, data):
-        return cls(
-            id=data.get('id'),
-            month=data.get('month'),
-            year=data.get('year'),
-            presences=data.get('presences', 0),
-            absences=data.get('absences', 0)
-        )
-
-    def to_json(self):
-        return {
-            'id': self.id,
-            'month': self.month,
-            'year': self.year,
-            'presences': self.presences,
-            'absences': self.absences,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -370,26 +329,34 @@ class Presences(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
-    month_records_id = Column(BigInteger, ForeignKey('month_records.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
+    month = Column(String(255), nullable=False)
+    year = Column(Integer, nullable=False)
+    presences = Column(Integer, nullable=False, default=0)
+    absences = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee")
-    month_record = relationship("MonthRecords")
-
+    
     @classmethod
     def to_model(cls, data):
         return cls(
             id=data.get('id'),
             employee_id=data.get('employee_id'),
-            month_records_id=data.get('month_records_id')
+            month=data.get('month'),
+            year=data.get('year'),
+            presences=data.get('presences', 0),
+            absences=data.get('absences', 0)
         )
 
     def to_json(self):
         return {
             'id': self.id,
             'employee_id': self.employee_id,
-            'month_records_id': self.month_records_id,
+            'month': self.month,
+            'year': self.year,
+            'presences': self.presences,
+            'absences': self.absences,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

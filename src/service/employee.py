@@ -8,26 +8,9 @@ class EmployeeService(Service):
         super().__init__(engine)
 
     def create(self, employee, user):
-
-        """
-            {
-                "name": "Eloide Simao",
-                "nickname": "Novela",
-                "email": "eloide.novela@outlook.com",
-                "passwd": "87475375",
-                "contact": "98375747837",
-                "access_level": "admin",
-                "positio_at_work": "engineer",
-                "nuit": "834889483",
-                "bi": "48489398398939y111",
-                "salary": 393499889,
-                "admission_date": "2026-11-11",
-                "academic_level": "ddd",
-                "department_id": "1"
-            }
-        """
-        try:
-            with Session(self.engine) as session:
+        # esta func cria um usuario e um empregado ja associados
+        with Session(self.engine) as session:
+            try:
                 from model.models import User
                 from model.models import UserEmployee
                 from service.user_employee import UserEmployeeService
@@ -36,30 +19,25 @@ class EmployeeService(Service):
                 session.add(new_employee)
                 session.add(new_user)
                 session.commit()
-
                 employee_id = new_employee.to_json().get("id")
                 user_id = new_user.to_json().get("id")
-
                 user_employee_service = UserEmployeeService(self.engine)
-
                 relation = user_employee_service.create({
                     "user_id": user_id,
                     "employee_id": employee_id
                 })
-                
                 return {
                         "employee": new_employee.to_json(),
                         "user": new_user.to_json(),
                         "user_employee": relation
                     }
-            
-        except Exception as e:
-            session.rollback()
-            return f"Error creating employee: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error creating employee: {str(e)}"
 
     def update(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:            
+            try:    
                 stmt = (
                     update(Employee)
                     .where(Employee.id == data.get('id'))
@@ -73,12 +51,13 @@ class EmployeeService(Service):
                 session.execute(stmt)
                 session.commit()
                 return "Employee updated successfully"
-        except Exception as e:
-            return f"Error updating employee: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error updating employee: {str(e)}"
 
     def delete(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:    
+            try:
                 query = delete(Employee).where(
                     or_(
                         Employee.id == data.get('id'),
@@ -88,8 +67,9 @@ class EmployeeService(Service):
                 session.execute(query)
                 session.commit()
                 return "Employee deleted successfully"
-        except Exception as e:
-            return f"Error deleting employee: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error deleting employee: {str(e)}"
 
     def get_all(self):
         try:
@@ -105,23 +85,17 @@ class EmployeeService(Service):
                         UserEmployee.user_id == User.id
                     )
                 )
-
                 result = session.execute(query).fetchall()
-                employees = []
-
+                employees =[]
                 for row in result:
                     employee = row.tuple()
-
                     employees.append({
                         "name": employee[0],
                         "nickname": employee[1],
                         "email": employee[2],
-                        "employee": employee[3]
+                        "employee": employee[3].to_json()
                     })
 
-                # result = session.execute(query).scalars().all()
-
-                # employees = [employee.to_json() for employee in result] 
                 return employees
         except Exception as e:
             return f"Error fetching employees: {str(e)}"
@@ -129,24 +103,25 @@ class EmployeeService(Service):
     def get_all_by_department(self, data):
         try:
             with Session(self.engine) as session:
-                from sqlalchemy import select, or_
-                from model.models import Department
+                from sqlalchemy import select
+                from model.models import User
 
-                query = select(Department).where(
-                    or_(
-                        Employee.department_id == data.get("department_id"),
-                        Department.name.ilike(data.get("name"))
-                    )
+                query = select(
+                    User.name, User.nickname, User.email, 
+                    Employee
+                ).where(
+                    Employee.department_id == data.get("department_id")
                 )
-                
                 result = session.execute(query).fetchall()
-
                 employees = []
-
                 for row in result:
-                    employee = row.tuple()[0]
-
-                    employees.append(employee.to_json())
+                    employee = row.tuple()
+                    employees.append({
+                        "name": employee[0],
+                        "nickname": employee[1],
+                        "email": employee[2],
+                        "employee": employee[3].to_json()
+                    })
 
                 return employees
         except Exception as e:

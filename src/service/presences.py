@@ -35,16 +35,17 @@ class PresencesService(Service):
             return f"Error updating presence record: {str(e)}"
 
     def delete(self, data):
-        try:
             with Session(self.engine) as session:
-                query = delete(Presences).where(
-                    Presences.id == data.get('id')
-                )
-                session.execute(query)
-                session.commit()
-                return "Presence record deleted successfully"
-        except Exception as e:
-            return f"Error deleting presence record: {str(e)}"
+                try:
+                    query = delete(Presences).where(
+                        Presences.id == data.get('id')
+                    )
+                    session.execute(query)
+                    session.commit()
+                    return "Presence record deleted successfully"
+                except Exception as e:
+                    session.rollback()
+                    return f"Error deleting presence record: {str(e)}"
 
     def get_all(self):
         try:
@@ -56,3 +57,13 @@ class PresencesService(Service):
                 return presences
         except Exception as e:
             return f"Error fetching presence records: {str(e)}"
+
+    def get_by_employee(self, data):
+        with Session(self.engine) as session:
+            from sqlalchemy import select
+            query = select(Presences).where(
+                Presences.employee_id == data.get("employee_id")
+            )
+            result = session.execute(query).scalars().all()
+            presences = [presence.to_json() for presence in result]
+            return presences

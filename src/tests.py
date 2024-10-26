@@ -4,7 +4,6 @@ from service.contacts import ContactService
 from service.department  import DepartmentService
 from service.employee_rating import EmployeeRatingService
 from service.goals import GoalsService
-from service.month_records import MonthRecordsService
 from service.performance_evaluation import PerformanceEvaluationService
 from service.presences import PresencesService
 from service.user_employee import UserEmployeeService
@@ -17,11 +16,50 @@ contact_service = ContactService(engine)
 department_service = DepartmentService(engine)
 employee_rating_service = EmployeeRatingService(engine)
 goals_service = GoalsService(engine)
-month_records_service = MonthRecordsService(engine)
 performance_evaluation_service = PerformanceEvaluationService(engine)
 presences_service = PresencesService(engine)
 user_employee_service = UserEmployeeService(engine)
 working_hours_service = WorkingHoursService(engine)
+
+# from model.models import Employee
+from datetime import datetime
+# from model.models import *
+
+# numbers = [number for number in [9, 5, 4, 2]]
+
+# print(employee_service.get_all())
+print(employee_service.get_all_by_department({"department_id": 1}))
+# print(contact_service.get_all())
+# print(presences_service.get_all())
+# print(numbers)
+# employee = Employee()
+
+# print(employee_service.create({
+#     'position_at_work': "engineer",
+#     'nuit': 293939197,
+#     'identity_card_bi': "383437754363767A2",
+#     'salary': 199292.091,
+#     'date_admission': datetime.now(),
+#     'academic_level': "higher",
+#     'department_id': 1,
+#     "age": 65,
+#     "length_of_service": 10
+# },
+# {
+#     "name": "Simao Pedro",
+#     "nickname": "Novela",
+#     "email": "simao.novela@gmail.com",
+#     "contact": "+258846937430",
+#     "username": "simao-pedro",
+#     "passwd": "10134456879",
+#     "access_level": "user"
+# }))
+
+
+# print(contact_service.create({
+#     "user_id": 1,
+#     "contact": "+258846937430"
+# }))
 
 # print(department_service.create({
 #     "name": "Informatica",
@@ -137,16 +175,16 @@ working_hours_service = WorkingHoursService(engine)
 # from model.models import Progression
 
 
-import jwt
+# import jwt
 
-key = "sifo-senha-secreta"
+# key = "sifo-senha-secreta"
 
-encoded = jwt.encode({
-  "token_de_acesso": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlbGRhLW5vdmVsYSIsImV4cCI6MTcyOTc5Mjc5OH0.rGqx-9OmX1iIttcqTPkzITcKRYtXfJmE9l5InaDuKgM",
-  "tipo_de_token": "bearer"
-}, key, algorithm="HS256")
-print(encoded)
-decoded = jwt.decode(encoded, key, algorithms="HS256")
-# {'some': 'payload'}
+# encoded = jwt.encode({
+#   "token_de_acesso": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlbGRhLW5vdmVsYSIsImV4cCI6MTcyOTc5Mjc5OH0.rGqx-9OmX1iIttcqTPkzITcKRYtXfJmE9l5InaDuKgM",
+#   "tipo_de_token": "bearer"
+# }, key, algorithm="HS256")
+# print(encoded)
+# decoded = jwt.decode(encoded, key, algorithms="HS256")
+# # {'some': 'payload'}
 
-print(decoded.get("tipo_de_token"))
+# print(decoded.get("tipo_de_token"))

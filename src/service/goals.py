@@ -19,50 +19,48 @@ class GoalsService(Service):
             return f"Error creating goal: {str(e)}"
 
     def update(self, data):
-        try:
             with Session(self.engine) as session:
-                stmt = (
-                    update(Goals)
-                    .where(Goals.id == data.get('id'))
-                    .values(
-                        description=data.get('description'),
-                        start_date=data.get('start_date'),
-                        conclusion_date=data.get('conclusion_date'),
-                        end_date=data.get('end_date'),
-                        employee_id=data.get('employee_id')
+                try:
+                    stmt = (
+                        update(Goals)
+                        .where(Goals.id == data.get('id'))
+                        .values(
+                            description=data.get('description'),
+                            start_date=data.get('start_date'),
+                            conclusion_date=data.get('conclusion_date'),
+                            end_date=data.get('end_date'),
+                            employee_id=data.get('employee_id')
+                        )
                     )
-                )
-                session.execute(stmt)
-                session.commit()
-                return "Goal updated successfully"
-        except Exception as e:
-            return f"Error updating goal: {str(e)}"
+                    session.execute(stmt)
+                    session.commit()
+                    return "Goal updated successfully"
+                except Exception as e:
+                    session.rollback()
+                    return f"Error updating goal: {str(e)}"
 
     def delete(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 query = delete(Goals).where(
                     or_(
-                        Goals.id == data.get('id'),
-                        Goals.description.like(f"%{data.get('description')}%")
+                        Goals.id == data.get('id')
                     )
                 )
                 session.execute(query)
                 session.commit()
                 return "Goal deleted successfully"
-        except Exception as e:
-            return f"Error deleting goal: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error deleting goal: {str(e)}"
 
     def get_all(self):
-        try:
-            with Session(self.engine) as session:
-                query = select(Goals)
-                result = session.execute(query).scalars().all()
+        with Session(self.engine) as session:
+            query = select(Goals)
+            result = session.execute(query).scalars().all()
 
-                goals = [goal.to_json() for goal in result]
-                return goals
-        except Exception as e:
-            return f"Error fetching goals: {str(e)}"
+            goals = [goal.to_json() for goal in result]
+            return goals
     
     def get_completed_goals_by_employee(self, data):
         with Session(self.engine) as session:
@@ -74,17 +72,6 @@ class GoalsService(Service):
                     Goals.status == GoalStatusEnum.completed
                 )
             )
-
-            result = session.execute(query).fetchall()
-            goals = []
-            for row in result:
-                goal = row.tuple()[0]
-                goals.append(goal.to_json())
-
+            result = session.execute(query).scalars().all()
+            goals = [goal.to_json() for goal in result]
             return goals
-
-            # goals_num = 0
-            # for row in goals:
-            #     goals_num += 1
-
-            # return goals_num

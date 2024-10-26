@@ -57,4 +57,3 @@ async def get_user_by_id(user_id: int, token: str = Depends(get_current_user)):
 @users_routes.get("/users/by-name/{name}", response_model=dict)
 async def get_user_by_name(name: str, token: str = Depends(get_current_user)):
     return user_service.get_by_name({"name": name})
-

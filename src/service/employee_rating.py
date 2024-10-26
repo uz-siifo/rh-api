@@ -9,8 +9,8 @@ class EmployeeRatingService(Service):
         super().__init__(engine)
 
     def create(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 from .goals import GoalsService
                 goals_service = GoalsService(self.engine)
                 new_rating = EmployeeRating.to_model(data)
@@ -22,13 +22,14 @@ class EmployeeRatingService(Service):
                 session.add(new_rating)
                 session.commit()
                 return new_rating.to_json()
-        except Exception as e:
-            return f"Error creating rating: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error creating rating: {str(e)}"
 
     def update(self, data):
         from sqlalchemy import update
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 from .goals import GoalsService
                 goals_service = GoalsService(self.engine)
                 stmt = (
@@ -49,26 +50,28 @@ class EmployeeRatingService(Service):
                 session.execute(stmt)
                 session.commit()
                 return "Rating updated successfully"
-        except Exception as e:
-            return f"Error updating rating: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error updating rating: {str(e)}"
 
     def delete(self, data):
         from sqlalchemy import delete
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 query = delete(EmployeeRating).where(EmployeeRating.id == data.get('id'))
                 session.execute(query)
                 session.commit()
                 return "Rating deleted successfully"
-        except Exception as e:
-            return f"Error deleting rating: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return f"Error deleting rating: {str(e)}"
 
     def get_all(self):
         try:
             with Session(self.engine) as session:
                 query = select(EmployeeRating)
-                result = session.execute(query).fetchall()
-                ratings = [row.EmployeeRating.to_json() for row in result]
+                result = session.execute(query).scalars().all()
+                ratings = [rating.EmployeeRating.to_json() for rating in result]
                 return ratings
         except Exception as e:
             return f"Erro ao buscar avalicoes: {str(e)}"
@@ -77,14 +80,18 @@ class EmployeeRatingService(Service):
         try:
             with Session(self.engine) as session:
                 rating = session.scalar(select(EmployeeRating).where(EmployeeRating.id == rating_id))
-                return rating.to_json() if rating else None
+                return rating.to_json()
         except Exception as e:
             return f"Erro ao buscar a avalicao pelo id: {str(e)}"
 
     def get_by_employee_id(self, employee_id):
         try:
             with Session(self.engine) as session:
-                ratings = session.execute(select(EmployeeRating).where(EmployeeRating.employee_id == employee_id)).fetchall()
-                return [row.EmployeeRating.to_json() for row in ratings]
+                query = select(EmployeeRating).where(
+                    EmployeeRating.employee_id == employee_id
+                )
+                result = session.execute(query).scalars().all()
+                ratings = [rating.EmployeeRating.to_json() for rating in result]
+                return ratings
         except Exception as e:
             return f"Erro ao buscar a avalicao pelo employee_id: {str(e)}"

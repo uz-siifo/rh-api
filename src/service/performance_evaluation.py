@@ -8,45 +8,49 @@ class PerformanceEvaluationService(Service):
         super().__init__(engine)
 
     def create(self, data):
-        try:
             with Session(self.engine) as session:
-                new_evaluation = PerformanceEvaluation.to_model(data)
-                session.add(new_evaluation)
-                session.commit()
-                return new_evaluation.to_json()
-        except Exception as e:
-            return f"Error creating performance evaluation: {str(e)}"
+                try:
+
+                    new_evaluation = PerformanceEvaluation.to_model(data)
+                    session.add(new_evaluation)
+                    session.commit()
+                    return new_evaluation.to_json()
+                except Exception as e:
+                    session.rollback()
+                    return f"Error creating performance evaluation: {str(e)}"
 
     def update(self, data):
-        try:
             with Session(self.engine) as session:
-                stmt = (
-                    update(PerformanceEvaluation)
-                    .where(PerformanceEvaluation.id == data.get('id'))
-                    .values(
-                        employee_id=data.get('employee_id'),
-                        employee_rating_id=data.get('employee_rating_id'),
-                        employee_goals_id=data.get('employee_goals_id'),
-                        feedback=data.get('feedback')
+                try:   
+                    stmt = (
+                        update(PerformanceEvaluation)
+                        .where(PerformanceEvaluation.id == data.get('id'))
+                        .values(
+                            employee_id=data.get('employee_id'),
+                            employee_rating_id=data.get('employee_rating_id'),
+                            employee_goals_id=data.get('employee_goals_id'),
+                            feedback=data.get('feedback')
+                        )
                     )
-                )
-                session.execute(stmt)
-                session.commit()
-                return "Performance evaluation updated successfully"
-        except Exception as e:
-            return f"Error updating performance evaluation: {str(e)}"
+                    session.execute(stmt)
+                    session.commit()
+                    return "Performance evaluation updated successfully"
+                except Exception as e:
+                    session.rollback()
+                    return str(e)
 
     def delete(self, data):
-        try:
             with Session(self.engine) as session:
-                query = delete(PerformanceEvaluation).where(
-                    PerformanceEvaluation.id == data.get('id')
-                )
-                session.execute(query)
-                session.commit()
-                return "Performance evaluation deleted successfully"
-        except Exception as e:
-            return f"Error deleting performance evaluation: {str(e)}"
+                try:
+                    query = delete(PerformanceEvaluation).where(
+                        PerformanceEvaluation.id == data.get('id')
+                    )
+                    session.execute(query)
+                    session.commit()
+                    return "Performance evaluation deleted successfully"
+                except Exception as e:
+                    session.rollback()
+                    return f"Error deleting performance evaluation: {str(e)}"
 
     def get_all(self):
         try:
