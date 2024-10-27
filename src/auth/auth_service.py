@@ -39,7 +39,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # Decodifica o token JWT
         username: str = payload.get("username")  # Extrai o username do payload
-        if username is None:  # Verifica se o username esta presente
+        if username is None: 
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         return username
     except jwt.PyJWTError:
