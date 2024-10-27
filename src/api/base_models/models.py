@@ -2,8 +2,9 @@ from pydantic import BaseModel
 from utils.enums import AccessLevelEnum
 
 class UserData(BaseModel):
-    username: str
-    passwd: str
+    id: int = None
+    username: str = None
+    passwd: str = None
     name: str = None
     nickname: str = None
     email: str = None
@@ -12,6 +13,7 @@ class UserData(BaseModel):
 
     def to_json(self):
         return {
+            "id": self.id,
             "name": self.name,
             "nickname": self.nickname,
             "email": self.email,
