@@ -26,23 +26,22 @@ class UserService(Service):
         super().__init__(engine)
 
     def create(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 from utils.util import util
                 if (util.is_email(data.get("email"))):
                     new_user = User.to_model(data)
                     contact = UserContact(contact=data.get('contact'))
                     new_user.contacts = [contact]
-
                     session.add(new_user)
                     session.commit()
-                    
                     return new_user.to_json()
-                
-        except Exception as e:
-            return str(e)           
+            except Exception as ex:
+                session.rollback()
+                return ex        
 
     def update(self, data):
+        
         from sqlalchemy import update
         with Session(self.engine) as session:
             try:
@@ -53,32 +52,37 @@ class UserService(Service):
                 )
                 session.execute(stmt)
                 session.commit()
-                return "OK"
+                return {"Status": "OK"}
+            
             except Exception as error:
                 session.rollback()
-                return str(error)
+                return error
             
     def delete(self, data):
         from sqlalchemy import delete, or_
         with Session(self.engine) as session:
-            query = None
-            if data.get("email") is not None:
+            try:
+                query = None
+                if data.get("email") is not None:
 
-                query = delete(User).where(
-                    or_(
-                        User.email.like(data.get('email')),
+                    query = delete(User).where(
+                        or_(
+                            User.email.like(data.get('email')),
+                        )
                     )
-                )
-            elif data.get("id") is not None:
-                query = delete(User).where(
-                    or_(
-                        User.id == data.get('id')
+                elif data.get("id") is not None:
+                    query = delete(User).where(
+                        or_(
+                            User.id == data.get('id')
+                        )
                     )
-                )
 
-            session.execute(query)
-            session.commit()
-            return "OK"
+                session.execute(query)
+                session.commit()
+                return {"status": "OK"}
+            except Exception as error:
+                session.rollback()
+                return error
 
     def get_all(self):
         with Session(self.engine) as session:
