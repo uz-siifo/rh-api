@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-# from settings import Settings
+from settings import Settings
 from sqlalchemy.types import Enum as PgEnum
 from utils.enums import *
 from sqlalchemy.orm import relationship
@@ -10,8 +10,8 @@ from sqlalchemy import (
     Column, ForeignKey, Text, Float, BigInteger, Boolean, Integer, String, DateTime, func 
 )
 
-# engine = create_engine(Settings().DATABASE_URL)
-engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True) # os dados ficam armazendos na memoria
+engine = create_engine(Settings().DATABASE_URL)
+# engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True) # os dados ficam armazendos na memoria
 
 Base = declarative_base()
 
