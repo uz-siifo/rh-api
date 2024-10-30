@@ -11,9 +11,9 @@ source venv/bin/activate  # Para Linux/MacOS
 venv\Scripts\activate     # Para Windows
 ```
 
-1.2. Instale o **FastAPI** e **Uvicorn** com o **pip**:
+1.2. Instale o **FastAPI** e **Uvicorn** e outras mais dependências do projeto com o **pip**:
 ```bash
-pip install fastapi uvicorn
+ pip install -r requirements.txt
 ```
 
 ### 2. **Executando o Projeto**
