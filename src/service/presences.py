@@ -8,14 +8,15 @@ class PresencesService(Service):
         super().__init__(engine)
 
     def create(self, data):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:    
+            try:    
                 new_presence = Presences.to_model(data)
                 session.add(new_presence)
                 session.commit()
                 return new_presence.to_json()
-        except Exception as e:
-            return f"Error creating presence record: {str(e)}"
+            except Exception as e:
+                session.rollback()
+                return e
 
     def update(self, data):
         try:
@@ -42,21 +43,19 @@ class PresencesService(Service):
                     )
                     session.execute(query)
                     session.commit()
-                    return "Presence record deleted successfully"
+                    return {"status": "OK"}
                 except Exception as e:
                     session.rollback()
-                    return f"Error deleting presence record: {str(e)}"
+                    return e
 
     def get_all(self):
-        try:
-            with Session(self.engine) as session:
-                query = select(Presences)
-                result = session.execute(query).scalars().all()
+        with Session(self.engine) as session:
+            query = select(Presences)
+            result = session.execute(query).scalars().all()
 
-                presences = [presence.to_json() for presence in result]
-                return presences
-        except Exception as e:
-            return f"Error fetching presence records: {str(e)}"
+            presences = [presence.to_json() for presence in result]
+            return presences
+
 
     def get_by_employee(self, data):
         with Session(self.engine) as session:

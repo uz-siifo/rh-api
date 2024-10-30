@@ -1,4 +1,4 @@
-from auth.auth_service import *
+from middlewares.auth import *
 from service.user import UserService
 from model.models import engine
 from fastapi import APIRouter
@@ -30,7 +30,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 """
 
 from api.base_models.models import UserData
-@users_routes.post("/users/create", response_model=dict)
+@users_routes.post("/admin/users/create", response_model=dict)
 async def create_user(data: UserData, token: str = Depends(get_current_admin)):
     result = user_service.create(data.to_json()) 
     if isinstance(result, Exception):
@@ -42,7 +42,7 @@ async def create_user(data: UserData, token: str = Depends(get_current_admin)):
     rota para atualizar inforcamacoes dos usuarios, esta rota e restrita apenas o admin do sistema
     Tem uma dependecia! 
 """
-@users_routes.put("/users/update", response_model=dict)
+@users_routes.put("/admin/users/update", response_model=dict)
 async def update_user(data: UserData, token: str = Depends(get_current_admin)):
     result = user_service.update(data.to_json())
 
@@ -51,7 +51,7 @@ async def update_user(data: UserData, token: str = Depends(get_current_admin)):
     
     return result
 
-@users_routes.delete("/users/delete", response_model=dict)
+@users_routes.delete("/admin/users/delete", response_model=dict)
 async def delete_user(data: dict, token: str = Depends(get_current_admin)):
 
     result = user_service.delete(data)
@@ -61,7 +61,7 @@ async def delete_user(data: dict, token: str = Depends(get_current_admin)):
     
     return result
 
-@users_routes.get("/users/", response_model=List[dict])
+@users_routes.get("/admin/users/", response_model=List[dict])
 async def get_all_users(token: str = Depends(get_current_admin)):
     return user_service.get_all()
 

@@ -33,7 +33,7 @@ class EmployeeService(Service):
                     }
             except Exception as e:
                 session.rollback()
-                return f"Error creating employee: {str(e)}"
+                return e
 
     def update(self, data):
         with Session(self.engine) as session:            
@@ -50,10 +50,10 @@ class EmployeeService(Service):
                 )
                 session.execute(stmt)
                 session.commit()
-                return "Employee updated successfully"
+                return {"status": "OK"}
             except Exception as e:
                 session.rollback()
-                return f"Error updating employee: {str(e)}"
+                return e
 
     def delete(self, data):
         with Session(self.engine) as session:    
@@ -66,10 +66,10 @@ class EmployeeService(Service):
                 )
                 session.execute(query)
                 session.commit()
-                return "Employee deleted successfully"
+                return {"status": "OK"}
             except Exception as e:
                 session.rollback()
-                return f"Error deleting employee: {str(e)}"
+                return e
 
     def get_all(self):
         try:
@@ -125,4 +125,4 @@ class EmployeeService(Service):
 
                 return employees
         except Exception as e:
-            return str(e)
+            return e

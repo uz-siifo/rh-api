@@ -22,9 +22,9 @@ class ProgressionService(Service):
                 session.commit()
                 return new_progression.to_json()
                 
-            except Exception as error:
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
             
     def update(self, data):
         with Session(self.engine) as session:
@@ -48,12 +48,11 @@ class ProgressionService(Service):
                         )
                 session.execute(stmt)
                 session.commit()
-                return "Ok"
+                return {"status": "OK"}
 
-            except Exception as error:
-
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
     
     def delete(self, data):
         with Session(self.engine) as session:
@@ -62,10 +61,10 @@ class ProgressionService(Service):
                 stmt = delete(Progression).where(id == data.get("id"))
                 session.execute(stmt)
                 session.commit()
-                return "OK"
-            except Exception as error:
+                return {"status": "OK"}
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
 
     def get_all(self):
         with Session(self.engine) as session:

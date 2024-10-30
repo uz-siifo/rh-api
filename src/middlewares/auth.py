@@ -9,7 +9,7 @@ import jwt
 from datetime import datetime, timedelta
 
 import os
-SECRET_KEY = os.getenv("SECRET_KEY", "sifo-senha-secreta")  # Obtendo a chave secreta do ambiente ou usando uma padrao
+SECRET_KEY = os.getenv("SECRET_KEY", "")  # Obtendo a chave secreta do ambiente ou usando uma padrao
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 ALGORITHM = "HS256"  # Algoritmo usado para codificacao JWT
@@ -38,7 +38,7 @@ async def create_access_token(data: dict, expires_delta: timedelta = None):
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])  # Decodifica o token JWT
-        username: str = payload.get("username")  # Extrai o username do payload
+        username: str = payload.get("sub")  # Extrai o username do payload
         if username is None: 
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         return username
@@ -73,29 +73,3 @@ async def get_current_admin(token: str = Depends(oauth2_scheme)):
             detail="Somente Admins e que têm acesso a este servico",
         )
     return username
-
-
-
-
-
-# # Funcao para verificar se as credenciais basicas sao corretas
-# def is_correct_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
-#     service = UserService(engine)  # Inicializa o servico de usuario
-#     current_username = credentials.username
-#     current_passwd = credentials.password
-
-#     # Verifica se o usuario e senha estao corretos
-#     is_correct_user = service.is_user({
-#         "username": current_username,
-#         "passwd": current_passwd
-#     })
-
-#     # Se as credenciais estiverem incorretas, uma excecao HTTP 401 e lancada
-#     if not is_correct_user:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Username ou Password incorreto",
-#             headers={"WWW-Authenticate": "Basic"}  # Para mostrar novamente a caixa de dialogo de login
-#         )
-    
-#     return credentials

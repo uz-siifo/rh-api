@@ -21,14 +21,27 @@ presences_service = PresencesService(engine)
 user_employee_service = UserEmployeeService(engine)
 working_hours_service = WorkingHoursService(engine)
 
+# print(user_employee_service.get_all_empl
+#oyee())
+
+# print(type)
+
+
+# from utils.enums import PositionAtWorkEnum
+
+# pos = PositionAtWorkEnum("engineer")
+
+# print(pos.value)
+# print(employee_service.get_all())
+# print(contact_service.get_all_by_user({"user_id": 1}))
 # from model.models import Employee
-from datetime import datetime
+# from datetime import datetime
 # from model.models import *
 
 # numbers = [number for number in [9, 5, 4, 2]]
 
 # print(employee_service.get_all())
-print(employee_service.get_all_by_department({"department_id": 1}))
+# print(employee_service.get_all_by_department({"department_id": 1}))
 # print(contact_service.get_all())
 # print(presences_service.get_all())
 # print(numbers)
@@ -93,7 +106,7 @@ print(employee_service.get_all_by_department({"department_id": 1}))
 # print(user_service.update({"id": 10, "nickname": "Sibanda"}))
 # print(contact_service.get_all())
 
-# print(user_service.get_all())
+print(user_service.get_all())
 # print(department_service.get_by_id({"id": 1}))
 
 # # print(user_ecle mployee_service.create({
@@ -124,6 +137,18 @@ print(employee_service.get_all_by_department({"department_id": 1}))
 #     "access_level": "admin",
 #     "contact": "+258876548339"
 # }))
+
+# print(user_service.update({
+#     "nickname": "_chume",
+#     "id": 3
+# }))
+
+# print({"nome": "Eloide"} == {"nom": "Eloide"})
+
+# print(user_service.get_by_id({"id": 3}))
+# a = KeyError()
+
+# print(isinstance(a, KeyError) )
 
 # # from datetime import datetime
 # # print(employee_service.create({

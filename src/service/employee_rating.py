@@ -24,7 +24,7 @@ class EmployeeRatingService(Service):
                 return new_rating.to_json()
             except Exception as e:
                 session.rollback()
-                return f"Error creating rating: {str(e)}"
+                return e
 
     def update(self, data):
         from sqlalchemy import update
@@ -49,10 +49,11 @@ class EmployeeRatingService(Service):
                 )
                 session.execute(stmt)
                 session.commit()
-                return "Rating updated successfully"
+                return {"status": "OK"}
+            
             except Exception as e:
                 session.rollback()
-                return f"Error updating rating: {str(e)}"
+                return e
 
     def delete(self, data):
         from sqlalchemy import delete
@@ -61,10 +62,11 @@ class EmployeeRatingService(Service):
                 query = delete(EmployeeRating).where(EmployeeRating.id == data.get('id'))
                 session.execute(query)
                 session.commit()
-                return "Rating deleted successfully"
+                return {"status": "OK"}
+            
             except Exception as e:
                 session.rollback()
-                return f"Error deleting rating: {str(e)}"
+                return e
 
     def get_all(self):
         try:
@@ -74,15 +76,18 @@ class EmployeeRatingService(Service):
                 ratings = [rating.EmployeeRating.to_json() for rating in result]
                 return ratings
         except Exception as e:
-            return f"Erro ao buscar avalicoes: {str(e)}"
+            return e
 
     def get_by_id(self, rating_id):
         try:
             with Session(self.engine) as session:
-                rating = session.scalar(select(EmployeeRating).where(EmployeeRating.id == rating_id))
+                from sqlalchemy import select
+                query = select(EmployeeRating).where(EmployeeRating.id == rating_id)
+                rating = session.execute(query).fetchone().tuple()[0]
                 return rating.to_json()
+            
         except Exception as e:
-            return f"Erro ao buscar a avalicao pelo id: {str(e)}"
+            return e
 
     def get_by_employee_id(self, employee_id):
         try:
@@ -94,4 +99,4 @@ class EmployeeRatingService(Service):
                 ratings = [rating.EmployeeRating.to_json() for rating in result]
                 return ratings
         except Exception as e:
-            return f"Erro ao buscar a avalicao pelo employee_id: {str(e)}"
+            return e

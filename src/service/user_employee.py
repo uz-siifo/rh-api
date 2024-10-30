@@ -21,19 +21,27 @@ class UserEmployeeService(Service):
 
     def create(self, data):
         with Session(self.engine) as session:
-            user_employee = UserEmployee.to_model(data)
-            session.add(user_employee)
-            session.commit()
-            return user_employee.to_json()
-        return "Bad"
-        
+            try:
+                user_employee = UserEmployee.to_model(data)
+                session.add(user_employee)
+                session.commit()
+                return user_employee.to_json()
+            except Exception as error:
+                session.rollback()
+                return error
+                    
     def delete(self, data):
         from sqlalchemy import delete
         with Session(self.engine) as session:
-            query = delete(UserEmployee).where(UserEmployee.id == data.get('id'))
-            session.execute(query)
-            session.commit()
-            return "OK"
+            try:
+                query = delete(UserEmployee).where(UserEmployee.id == data.get('id'))
+                session.execute(query)
+                session.commit()
+                return {"status": "OK"}
+
+            except Exception as error:
+                session.rollback()
+                return error
 
     def update(self, data):
         with Session(self.engine) as session:
@@ -51,12 +59,12 @@ class UserEmployeeService(Service):
                         ).values(user_id = data.get("user_id"))
                 session.execute(query)
                 session.commit()
-                return "OK"
+                return {"status": "OK"}
             except Exception as error:
                 session.rollback()
                 return str(error)
 
-    def get_all(self):
+    def get_all(self) -> list:
         from sqlalchemy import Select
         with Session(self.engine) as session:
             query = Select(UserEmployee)
@@ -74,7 +82,6 @@ class UserEmployeeService(Service):
                 User.email,  
                 Employee.identity_card_bi, 
                 Employee.nuit,
-                # Department.name,
                 Employee.position_at_work
             ).where(
                 and_(
@@ -83,6 +90,18 @@ class UserEmployeeService(Service):
                 )
             )
 
-            employee = session.execute(query).scalars().one()
+            result = session.execute(query).fetchall()
+            employee = {}
 
-            return employee.to_json()
+            for row in result:
+
+                employee = {
+                    "name": row[0],
+                    "nickname": row[1],
+                    "email": row[2],
+                    "identity_card_bi": row[3],
+                    "nuit": row[4],
+                    "position_at_work": row[5].get_value()
+                }
+
+            return employee

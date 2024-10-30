@@ -11,26 +11,33 @@ class ContactService(Service):
         from utils.util import util
         if (util.is_contact(data.get('contact'))):
             with Session(self.engine) as session:
-
-                new_contact = UserContact.to_model(data)
-                session.add(new_contact)
-                session.commit()
-                return new_contact.to_json()
+                try:
+                    new_contact = UserContact.to_model(data)
+                    session.add(new_contact)
+                    session.commit()
+                    return new_contact.to_json()
+                except Exception as error:
+                    session.rollback()
+                    return error
                 
         return "Contacto Invalido!"
             
     def delete(self, data):
         from sqlalchemy import delete, or_
         with Session(self.engine) as session:
-            query = delete(UserContact).where(
-                or_(
-                    UserContact.id == data.get('id'), 
-                    UserContact.contact.like(data.get('contact'))
+            try:
+                query = delete(UserContact).where(
+                    or_(
+                        UserContact.id == data.get('id'), 
+                        UserContact.contact.like(data.get('contact'))
+                    )
                 )
-            )
-            session.execute(query)
-            session.commit()
-            return "OK"
+                session.execute(query)
+                session.commit()
+                return {"Status": "OK"}
+            except Exception as error:
+                session.rollback()
+                return error
         
     def update(self, data):
         from utils.util import util
@@ -45,10 +52,10 @@ class ContactService(Service):
                     )
                     session.execute(stmt)
                     session.commit()
-                    return "OK"
-            except Exception as e:
+                    return {"status": "OK"}
+            except Exception as error:
                 session.rollback()
-                return str(e)
+                return error
             
         return "Contacto Invalido!"
 

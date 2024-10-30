@@ -13,9 +13,9 @@ class DepartmentService(Service):
                 session.add(new_department)
                 session.commit()
                 return new_department.to_json()
-            except Exception as error:
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
             
     def delete(self, data):
         from sqlalchemy import delete, or_
@@ -24,10 +24,10 @@ class DepartmentService(Service):
                 query = delete(Department).where(or_((Department.id == data.get('id')), (Department.name.ilike(data.get('name')))))
                 session.execute(query)
                 session.commit()
-                return "OK"
-            except Exception as error:
+                return {"status": "OK"}
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
             
     def update(self, data):
         from sqlalchemy import update
@@ -40,9 +40,9 @@ class DepartmentService(Service):
 
                 session.commit()
                 return new_department.to_json()
-            except Exception as error:
+            except Exception as e:
                 session.rollback()
-                return str(error)
+                return e
 
     def get_all(self):
         with Session(self.engine) as session:
@@ -61,7 +61,7 @@ class DepartmentService(Service):
                 return department.to_json()
              
         except Exception as e:
-            return str(e)
+            return e
     
     def get_all_by_employee(self, data):
         with Session(self.engine) as session:

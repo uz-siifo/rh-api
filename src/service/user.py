@@ -135,3 +135,13 @@ class UserService(Service):
             result = session.execute(query).fetchall()
 
             return len(result) > 0
+    def get_id_by_username(self, data):
+        with Session(self.engine) as session:
+            from sqlalchemy import select
+            query = select(User.id).where(
+                User.username.ilike(data.get("username"))
+            )
+
+            result = session.execute(query).fetchone()
+
+            return result.tuple()[0]
