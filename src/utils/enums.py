@@ -33,3 +33,6 @@ class GoalStatusEnum(enum.Enum):
 
     def get_value(self):
         return self.value
+class EmployeeState(enum.Enum):
+    active = "ativo"
+    

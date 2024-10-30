@@ -10,8 +10,18 @@ from api.routes.employee_routes import employee_router
 from api.routes.progression_routes import progression_router
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+# Permitir CORS para o frontend React (ou outra origem)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # URL do React
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(users_routes)
 app.include_router(contact_router)

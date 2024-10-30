@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from settings import Settings
+# from settings import Settings
 from sqlalchemy.types import Enum as PgEnum
 from utils.enums import *
 from sqlalchemy.orm import relationship
@@ -10,7 +10,9 @@ from sqlalchemy import (
     Column, ForeignKey, Text, Float, BigInteger, Boolean, Integer, String, DateTime, func 
 )
 
-engine = create_engine(Settings().DATABASE_URL)
+# engine = create_engine(Settings().DATABASE_URL)
+engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True) # os dados ficam armazendos na memoria
+
 Base = declarative_base()
 
 class User(Base):
@@ -94,12 +96,13 @@ class Employee(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     position_at_work = Column(PgEnum(PositionAtWorkEnum, name="position_at_work_enum", create_type=False), nullable=False)
-    nuit = Column(BigInteger, nullable=False, unique=True)
-    identity_card_bi = Column(String(255), nullable=False, unique=True)
-    salary = Column(Float, nullable=False, default=0)
+    # nuit = Column(BigInteger, nullable=False, unique=True)
+    # identity_card_bi = Column(String(255), nullable=False, unique=True)
+    # salary = Column(Float, nullable=False, default=0)
     date_admission = Column(DateTime, nullable=False)
+    state = Column(String, nullable=False)
     length_of_service = Column(Integer, nullable=True)
-    age = Column(Integer, nullable=True)
+    # age = Column(Integer, nullable=True)
     academic_level = Column(String(255), nullable=False)
     department_id = Column(BigInteger, ForeignKey('department.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

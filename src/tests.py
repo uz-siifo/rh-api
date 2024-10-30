@@ -49,9 +49,9 @@ working_hours_service = WorkingHoursService(engine)
 
 # print(employee_service.create({
 #     'position_at_work': "engineer",
-#     'nuit': 293939197,
+#     # 'nuit': 293939197,
 #     'identity_card_bi': "383437754363767A2",
-#     'salary': 199292.091,
+#     # 'salary': 199292.091,
 #     'date_admission': datetime.now(),
 #     'academic_level': "higher",
 #     'department_id': 1,
