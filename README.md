@@ -21,9 +21,9 @@ Com o código definido, é hora de executar o projeto utilizando o **Uvicorn**.
 
 4.1. No terminal, dentro do diretório do projeto, execute o seguinte comando:
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
-- O argumento `app.main:app` refere-se ao caminho do módulo. `app` é o diretório onde está o arquivo `main.py`, e `app` é a instância do FastAPI dentro deste arquivo.
+- O argumento `main:app` refere-se ao caminho do módulo. `main.py` é o arquivo principal do programa, e `app` é a instância do FastAPI dentro deste arquivo.
 - O argumento `--reload` é utilizado para recarregar o servidor automaticamente sempre que houver mudanças no código durante o desenvolvimento.
 
 ### 3. **Gerando Arquivo de Dependências**
@@ -38,7 +38,7 @@ pip freeze > requirements.txt
 
 - **Rodar o servidor FastAPI**:
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 - **Gerar um arquivo de dependências**:
