@@ -95,23 +95,29 @@ class UserService(Service):
     
     def is_user(self, data):
         with Session(self.engine) as session:
-            from sqlalchemy import select, and_
-            query = select(User).where(and_(
-                User.username == data.get("username"),
-                User.passwd == data.get("passwd")
-            ))
+            try:
+                from sqlalchemy import select, and_
+                query = select(User).where(and_(
+                    User.username == data.get("username"),
+                    User.passwd == data.get("passwd")
+                ))
 
-            res = session.execute(query).first()
-            
-            return res is not None
+                res = session.execute(query).fetchone()
+                
+                return res.tuple()[0].to_json()
+            except Exception as e:
+                return e
         
     def get_by_id(self, data):
         with Session(self.engine) as session:
-            user = session.scalar(
+            try:
+                user = session.scalar(
                 select(User).where(User.id == data.get('id'))
-            )
+                )
 
-            return user.to_json()
+                return user.to_json()
+            except Exception as e:
+                return e
 
     def get_by_name(self, data):
         with Session(self.engine) as session:
