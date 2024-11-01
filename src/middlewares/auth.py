@@ -19,9 +19,20 @@ security = HTTPBasic()
 
 # Funcao para autenticar um usuario com base em username e senha
 async def authenticate_user(username: str, password: str):
-    user_service = UserService(engine)
-    user = user_service.is_user({"username": username, "passwd": password})
-    return user
+    try:
+        user_service = UserService(engine)
+        user = user_service.is_user({"username": username, "passwd": password})
+        
+        return {
+            "name": user.get("name"),
+            "email": user.get("email"),
+            "username": user.get("username"),
+            "user_id": user.get("id"),
+            "role": user.get("access_level")
+        }
+    
+    except Exception as e:
+        return e
 
 # Funcao para criar um token de acesso JWT
 async def create_access_token(data: dict, expires_delta: timedelta = None):
