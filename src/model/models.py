@@ -7,11 +7,11 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 
 from sqlalchemy import (
-    Column, ForeignKey, Text, Float, BigInteger, Boolean, Integer, String, DateTime, func 
+    Column, ForeignKey, Text, BigInteger, Boolean, Integer, String, DateTime, func 
 )
 
 engine = create_engine(Settings().DATABASE_URL)
-# engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True) # os dados ficam armazendos na memoria
+# engine = create_engine("sqlite+pysqlite:///db.sqlite", echo=True, future=True) # os dados ficam armazendos na memoria
 
 Base = declarative_base()
 
@@ -62,9 +62,6 @@ class Department(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(255), nullable=False, unique=True)
-    employee_nums = Column(BigInteger, nullable=False, default=0)
-    min_salary = Column(Float, nullable=False, default=0)
-    max_salary = Column(Float, nullable=False, default=0)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=True)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=True)
 
@@ -74,19 +71,13 @@ class Department(Base):
     def to_model(cls, data):
         return cls(
             id=data.get('id'),
-            name=data.get('name'),
-            employee_nums=data.get('employee_nums', 0),
-            min_salary=data.get('min_salary', 0.0),
-            max_salary=data.get('max_salary', 0.0)
+            name=data.get('name')
         )
 
     def to_json(self):
         return {
             'id': self.id,
             'name': self.name,
-            'employee_nums': self.employee_nums,
-            'min_salary': self.min_salary,
-            'max_salary': self.max_salary,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -96,13 +87,9 @@ class Employee(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     position_at_work = Column(PgEnum(PositionAtWorkEnum, name="position_at_work_enum", create_type=False), nullable=False)
-    # nuit = Column(BigInteger, nullable=False, unique=True)
-    # identity_card_bi = Column(String(255), nullable=False, unique=True)
-    # salary = Column(Float, nullable=False, default=0)
     date_admission = Column(DateTime, nullable=False)
-    state = Column(String, nullable=False)
+    state = Column(PgEnum(EmployeeState, name="employee_state_enum", create_type=False), nullable=False, default=EmployeeState.inactive)
     length_of_service = Column(Integer, nullable=True)
-    # age = Column(Integer, nullable=True)
     academic_level = Column(String(255), nullable=False)
     department_id = Column(BigInteger, ForeignKey('department.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -119,9 +106,8 @@ class Employee(Base):
         return cls(
             id=data.get('id'),
             position_at_work=data.get('position_at_work'),
-            nuit=data.get('nuit'),
-            identity_card_bi=data.get('identity_card_bi'),
-            salary=data.get('salary', 0),
+            state=data.get("state"),
+            length_of_service=data.get("length_of_service"),
             date_admission=data.get('date_admission'),
             academic_level=data.get('academic_level'),
             department_id=data.get('department_id')
@@ -131,9 +117,8 @@ class Employee(Base):
         return {
             'id': self.id,
             'position_at_work': self.position_at_work.name if self.position_at_work else None,
-            'nuit': self.nuit,
-            'identity_card_bi': self.identity_card_bi,
-            'salary': self.salary,
+            'state': self.state,
+            'length_of_service': self.length_of_service,
             'date_admission': self.date_admission.isoformat() if self.date_admission else None,
             'academic_level': self.academic_level,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -256,7 +241,7 @@ class Goals(Base):
     start_date = Column(DateTime, nullable=False)
     conclusion_date = Column(DateTime, nullable=False)
     end_date = Column(DateTime, nullable=False)
-    status = Column(PgEnum(GoalStatusEnum), nullable=False, default=GoalStatusEnum.not_started)
+    status = Column(PgEnum(GoalStatusEnum, name="goals_status_enum", create_type=False), nullable=False, default=GoalStatusEnum.not_started)
     employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -297,7 +282,7 @@ class PerformanceEvaluation(Base):
     employee_id = Column(BigInteger, ForeignKey('employee.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     employee_rating_id = Column(BigInteger, ForeignKey('employee_rating.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
     employee_goals_id = Column(BigInteger, ForeignKey('goals.id', onupdate="NO ACTION", ondelete="NO ACTION"), nullable=False)
-    feedback = Column(PgEnum(FeedbackEnum), nullable=False)
+    feedback = Column(PgEnum(FeedbackEnum, name="feedback_enum"), nullable=False, default=FeedbackEnum.satisfatorio)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -422,4 +407,6 @@ class Progression(Base):
             description=data.get("description")
         )
 
-Base.metadata.create_all(engine)
+# funcao que vai criar todas scheme no sgbd
+def get_storage():
+    Base.metadata.create_all(engine)
