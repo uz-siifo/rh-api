@@ -53,15 +53,54 @@ class PerformanceEvaluationService(Service):
             except Exception as e:
                 session.rollback()
                 return e
-
+        
     def get_all(self):
         with Session(self.engine) as session:
-            query = select(PerformanceEvaluation)
-            result = session.execute(query).scalars().all()
+            from sqlalchemy import select, and_
+            from model.models import EmployeeRating, Presences
 
-            evaluations = [evaluation.to_json() for evaluation in result]
-            return evaluations
-        
+            query = select(
+                EmployeeRating.is_assiduous,
+                EmployeeRating.is_collaborative,
+                EmployeeRating.completed_goals,
+                EmployeeRating.is_punctual,
+                Presences.presences,
+                Presences.absences,
+                EmployeeRating.work_quality_rating,
+                EmployeeRating.problem_solving_skills_rating,
+                EmployeeRating.communication_skills_rating,
+                EmployeeRating.time_management_skills_rating,
+                EmployeeRating.leadership_skills_rating
+
+            ).where(
+                and_(
+                    PerformanceEvaluation.employee_id == EmployeeRating.employee_id,
+                    PerformanceEvaluation.employee_id == Presences.employee_id
+                )
+            )
+
+            result = session.execute(query).fetchall()
+            performance_evaluations = []
+
+            for row in result:
+                performance_evaluation = row.tuple()
+                performance_evaluations.append({
+                    "is_assiduous": performance_evaluation[0],
+                    "is_collaborative": performance_evaluation[1],
+                    "completed_goals": performance_evaluation[2],
+                    "is_punctual": performance_evaluation[3], 
+                    "presences": performance_evaluation[4],
+                    "absences": performance_evaluation[5],
+                    "work_quality_rating": performance_evaluation[6],
+                    "problem_solving_skills_rating": performance_evaluation[7],
+                    "communication_skills_rating": performance_evaluation[8],
+                    "time_management_skills_rating": performance_evaluation[9],
+                    "leadership_skills_rating": performance_evaluation[10]
+                })
+
+            return performance_evaluations
+
+
     def get_by_employee(self, data):
         with Session(self.engine) as session:
             from sqlalchemy import select
