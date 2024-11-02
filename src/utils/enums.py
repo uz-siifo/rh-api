@@ -1,6 +1,6 @@
 import enum
 
-class AccessLevelEnum(enum.Enum):
+class Role(enum.Enum):
     admin = 'admin'
     user = 'user'
 
@@ -33,6 +33,13 @@ class GoalStatusEnum(enum.Enum):
 
     def get_value(self):
         return self.value
+    
 class EmployeeState(enum.Enum):
     active = "ativo"
+    inactive = "inativo"
+    on_vocation = "esta de férias"
+
+    def get_value(self):
+        return self.value
+    
     
