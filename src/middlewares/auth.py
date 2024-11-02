@@ -28,7 +28,7 @@ async def authenticate_user(username: str, password: str):
             "email": user.get("email"),
             "username": user.get("username"),
             "user_id": user.get("id"),
-            "role": user.get("access_level")
+            "role": user.get("role")
         }
     
     except Exception as e:
