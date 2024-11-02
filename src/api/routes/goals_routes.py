@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from service.goals import GoalsService
 from model.models import engine
 from middlewares.auth import get_current_user, get_current_admin
-from api.base_models.models import GoalsData, UpdateGoalsData
+from base_models.goal import GoalData, UpdateGoalData
 
 goals_router = APIRouter()
 
 @goals_router.post("/admin/goals", response_model = dict)
-async def create_goal(data: GoalsData, user: str = Depends(get_current_admin)):
+async def create_goal(data: GoalData, user: str = Depends(get_current_admin)):
     """
     Apenas gestores podem criar novas metas.
     """
@@ -20,7 +20,7 @@ async def create_goal(data: GoalsData, user: str = Depends(get_current_admin)):
     return result
 
 @goals_router.put("/admin/goals/{goal_id}", response_model=dict)
-async def update_goal(data: UpdateGoalsData, user: str = Depends(get_current_admin)):
+async def update_goal(data: UpdateGoalData, user: str = Depends(get_current_admin)):
     """
     Apenas gestores podem atualizar as metas.
     """
@@ -59,7 +59,7 @@ async def list_completed_goals(user: str = Depends(get_current_admin)):
 @goals_router.get("/goals", response_model=list)
 async def list_goals(user: str = Depends(get_current_user)):
     """
-    Esta rota pode ser acessada por um usuario normail para listar suas metas.
+    Esta rota pode ser acessada por um usuario normal para listar suas metas.
     """
     from service.user import UserService
     user_service = UserService(engine)

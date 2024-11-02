@@ -3,38 +3,20 @@ from service.user import UserService
 from model.models import engine
 from fastapi import APIRouter
 
+
 users_routes = APIRouter()
 user_service = UserService(engine)
 
-"""
-    rota para o login dos usuarios, esta rota nao tem nenhuma dependecia
-"""
-@users_routes.post("/login", response_model=dict)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user = await authenticate_user(form_data.username, form_data.password) # funcao de autenticacao
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Credencias Invalidas",
-        )
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) # tempo de vida do token de acesso
-    access_token = await create_access_token(
-        data={"sub": form_data.username}, expires_delta=access_token_expires
-    )
-    return {"token_de_acesso": access_token, "tipo_de_token": "bearer"}
-
-"""
-    rota para criacao de novos usuarios, esta rota e restrita apenas o admin do sistema
-    Tem uma dependecia!
-"""
-
 from api.base_models.models import UserData
+from api.base_models.models import EmployeeData
+
 @users_routes.post("/admin/users/create", response_model=dict)
-async def create_user(data: UserData, token: str = Depends(get_current_admin)):
-    result = user_service.create(data.to_json()) 
+async def create_user(user_data: UserData, employee_data: EmployeeData, token: str = Depends(get_current_admin)):
+    from service.employee import EmployeeService
+    employee_service = EmployeeService(engine)
+    result = employee_service.create(employee_data.to_json(), user_data.to_json())
     if isinstance(result, Exception):
-        return {"Erro": "Ocorreu um erro"}
+        return {"Erro": str(result)}
     
     return result
 

@@ -18,7 +18,10 @@ async def create_performance_evaluation(data: PerformanceEvaluationData, token: 
     """
     result = performance_evaluation_service.create(data.to_json())
     if isinstance(result, Exception):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(result))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=str(result)
+        )
     return result
 
 @performance_evaluation_router.put("/admin/performance-evaluations/update", response_model=dict)
@@ -29,7 +32,10 @@ async def update_performance_evaluation(data: UpdatePerformanceEvaluationData, t
     """
     result = performance_evaluation_service.update(data.to_json())
     if isinstance(result, Exception):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(result))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=str(result)
+        )
     return result
 
 @performance_evaluation_router.delete("/admin/performance-evaluations/delete", response_model=dict)
@@ -40,7 +46,9 @@ async def delete_performance_evaluation(evaluation_id: int, token: str = Depends
     """
     result = performance_evaluation_service.delete({"id": evaluation_id})
     if isinstance(result, Exception):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(result))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(result)
+        )
     return result
 
 @performance_evaluation_router.get("/admin/performance-evaluations/", response_model=list)

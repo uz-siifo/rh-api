@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from service.employee_rating import EmployeeRatingService
 from model.models import engine
 from middlewares.auth import get_current_admin, get_current_user
-from api.base_models.models import RatingData, UpdateRatingData
+from base_models.rating import RatingData, UpdateRatingData
 
 rating_router = APIRouter()
 rating_service = EmployeeRatingService(engine)

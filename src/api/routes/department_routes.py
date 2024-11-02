@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends
 from service.department import DepartmentService
 from model.models import engine
 from middlewares.auth import get_current_admin
-from api.base_models.models import DepartmentData
+from base_models.department import DepartmentData
 
-# Definicao da API Router
 department_router = APIRouter()
 department_service = DepartmentService(engine)
 
