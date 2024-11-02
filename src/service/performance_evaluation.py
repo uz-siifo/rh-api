@@ -70,7 +70,8 @@ class PerformanceEvaluationService(Service):
                 EmployeeRating.problem_solving_skills_rating,
                 EmployeeRating.communication_skills_rating,
                 EmployeeRating.time_management_skills_rating,
-                EmployeeRating.leadership_skills_rating
+                EmployeeRating.leadership_skills_rating,
+                EmployeeRating.employee_id
 
             ).where(
                 and_(
@@ -95,7 +96,8 @@ class PerformanceEvaluationService(Service):
                     "problem_solving_skills_rating": performance_evaluation[7],
                     "communication_skills_rating": performance_evaluation[8],
                     "time_management_skills_rating": performance_evaluation[9],
-                    "leadership_skills_rating": performance_evaluation[10]
+                    "leadership_skills_rating": performance_evaluation[10],
+                    "employee_id": performance_evaluation[11]
                 })
 
             return performance_evaluations

@@ -70,3 +70,18 @@ class DepartmentService(Service):
             result = session.execute(query).fetchall()
             departments = [department.tuple()[0].to_json() for department in result]  
             return departments
+        
+    def get_by_name(self, data):
+        with Session(self.engine) as session:
+            try:
+                from sqlalchemy import select
+                query = select(Department).where(
+                    Department.name.ilike(data.get("department_name"))
+                )
+
+                department = session.execute(query).fetchone().tuple()[0]
+                return department.to_json()
+
+            except Exception as e:
+                return e
+                

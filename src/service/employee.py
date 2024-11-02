@@ -7,25 +7,53 @@ class EmployeeService(Service):
     def __init__(self, engine) -> None:
         super().__init__(engine)
 
-    def create(self, employee, user):
+    def create(self, data):
         # esta func cria um usuario e um empregado ja associados
+
+        user = {
+            "name": data.get('name'),
+            "nickname": data.get('nickname'),
+            "username": data.get('username'),
+            "email": data.get('email'),
+            "passwd": data.get('passwd'),
+            "role": data.get('role'),
+            "contact": data.get("contact")
+        }
+
+        employee = {
+            "position_at_work": data.get('position'),
+            "state": data.get("state"),
+            "length_of_service": data.get("length_of_service"),
+            "date_admission": data.get('date_admission'),
+            'academic_level': data.get('academic_level'),
+            "department_id": 0
+        }
+            
         with Session(self.engine) as session:
             try:
                 from model.models import User
-                from model.models import UserEmployee
                 from service.user_employee import UserEmployeeService
+                from service.department import DepartmentService
+
+                user_employee_service = UserEmployeeService(self.engine)
+                department_service = DepartmentService(self.engine)
+                department = department_service.get_by_name({"department_name": data.get("department")})
+                employee.update({"department_id": department.get("id")})
+                
                 new_employee = Employee.to_model(employee)
                 new_user = User.to_model(user)
+                
                 session.add(new_employee)
                 session.add(new_user)
                 session.commit()
                 employee_id = new_employee.to_json().get("id")
                 user_id = new_user.to_json().get("id")
-                user_employee_service = UserEmployeeService(self.engine)
+                
                 relation = user_employee_service.create({
                     "user_id": user_id,
                     "employee_id": employee_id
                 })
+
                 return {
                         "employee": new_employee.to_json(),
                         "user": new_user.to_json(),
@@ -43,7 +71,6 @@ class EmployeeService(Service):
                     .where(Employee.id == data.get('id'))
                     .values(
                         name=data.get('name'),
-                        identity_card_bi=data.get('identity_card_bi'),
                         position=data.get('position'),
                         department=data.get('department')
                     )

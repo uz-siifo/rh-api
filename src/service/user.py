@@ -131,16 +131,17 @@ class UserService(Service):
     def is_admin(self, username):
         with Session(self.engine) as session:
             from sqlalchemy import select, and_
-            from utils.enums import AccessLevelEnum
+            from utils.enums import Role
 
             query = select(User).where(and_(
                 User.username.ilike(username),
-                User.access_level == AccessLevelEnum.admin
+                User.role == Role.admin
             ))
 
             result = session.execute(query).fetchall()
 
             return len(result) > 0
+            
     def get_id_by_username(self, data):
         with Session(self.engine) as session:
             from sqlalchemy import select
