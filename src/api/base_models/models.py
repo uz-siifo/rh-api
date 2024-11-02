@@ -9,7 +9,7 @@ class UserData(BaseModel):
     nickname: str = None
     email: str = None
     contact: str = None
-    access_level: AccessLevelEnum = AccessLevelEnum.user
+    role: AccessLevelEnum = AccessLevelEnum.user
 
     def to_json(self):
         return {
@@ -19,7 +19,7 @@ class UserData(BaseModel):
             "email": self.email,
             "passwd": self.passwd,
             "contact": self.contact,
-            "access_level": self.access_level,
+            "role": self.role,
             "username": self.username
         }
     
@@ -46,62 +46,15 @@ class UpdateContactData(BaseModel):
             "contact": self.contact
         }
     
-from datetime import datetime  
-class EmployeeData(BaseModel):
-    id: int = None
-    name: str = None
-    identity_card_bi: str = None
-    nuit: str = None
-    position: str = None
-    department: str = None
-    academic_level: str = None
-    salary: float = None
-    date_admission: datetime = None
-    position_at_work: str = None
-
-    def to_json(self):
-        return {
-            'id': self.id,
-            'position_at_work': self.position_at_work,
-            'nuit': self.nuit,
-            'identity_card_bi': self.identity_card_bi,
-            'salary': self.salary,
-            'date_admission': self.date_admission,
-            'academic_level': self.academic_level,
-            'department_id': self.department
-        }
-
-class UpdateEmployeeData(BaseModel):
-    id: int
-    name: str = None
-    identity_card_bi: str = None
-    nuit: str = None
-    position: str = None
-    department: str = None
-
-    def to_json(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "identity_card_bi": self.identity_card_bi,
-            "nuit": self.nuit,
-            "position": self.position,
-            "department": self.department
-        }
 
 class DepartmentData(BaseModel):
     name: str
     description: str = None
-    min_salary: float
-    max_salary: float
-    employee_nums: int = None
 
     def to_json(self):
         return {
             "name": self.name,
-            "description": self.description,
-            "min_salary": self.min_salary,
-            "max_salary": self.max_salary
+            "description": self.description
         }
 
 class UserEmployeeData(BaseModel):
@@ -242,7 +195,8 @@ class UpdatePerformanceEvaluationData(BaseModel):
             "employee_goals_id": self.employee_goals_id,
             "feedback": self.feedback
         }
-    
+
+from datetime import datetime  
 class GoalsData(BaseModel):
     description: str
     start_date: datetime 
