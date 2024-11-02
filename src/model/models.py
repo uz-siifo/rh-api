@@ -24,7 +24,7 @@ class User(Base):
     username = Column(String(225), nullable=False, unique=True)
     email = Column(String(255), nullable=False, unique=True)
     passwd = Column(String(255), nullable=False)
-    access_level = Column(PgEnum(AccessLevelEnum, name="access_level_enum"), nullable=False)
+    role = Column(PgEnum(Role, name="role"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -40,7 +40,7 @@ class User(Base):
             username=data.get('username'),
             email=data.get('email'),
             passwd=data.get('passwd'),
-            access_level=data.get('access_level')
+            role=data.get('role')
         )
 
     def to_json(self):
@@ -51,7 +51,7 @@ class User(Base):
             'username': self.username,
             'email': self.email,
             'passwd': self.passwd,
-            'access_level': self.access_level.name if self.access_level else None,
+            'role': self.role.name if self.role else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'contacts': [contact.to_json() for contact in self.contacts]
