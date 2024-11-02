@@ -21,19 +21,14 @@ class PresencesService(Service):
     def update(self, data):
         try:
             with Session(self.engine) as session:
-                stmt = (
-                    update(Presences)
-                    .where(Presences.id == data.get('id'))
-                    .values(
-                        employee_id=data.get('employee_id'),
-                        month_records_id=data.get('month_records_id')
-                    )
-                )
-                session.execute(stmt)
+                presence = session.query(Presences).filter(Presences.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(presence, key)):
+                        setattr(presence, key, value)
                 session.commit()
-                return "Presence record updated successfully"
+                return presence.to_json()
         except Exception as e:
-            return f"Error updating presence record: {str(e)}"
+            return e
 
     def delete(self, data):
             with Session(self.engine) as session:

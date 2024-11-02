@@ -21,21 +21,14 @@ class PerformanceEvaluationService(Service):
 
     def update(self, data):
         with Session(self.engine) as session:
-            try:   
-                stmt = (
-                    update(PerformanceEvaluation)
-                    .where(PerformanceEvaluation.id == data.get('id'))
-                    .values(
-                        employee_id=data.get('employee_id'),
-                        employee_rating_id=data.get('employee_rating_id'),
-                        employee_goals_id=data.get('employee_goals_id'),
-                        feedback=data.get('feedback')
-                    )
-                )
-                session.execute(stmt)
+            try: 
+
+                performance_evaluation = session.query(PerformanceEvaluation).filter(PerformanceEvaluation.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(performance_evaluation, key)):
+                        setattr(performance_evaluation, key, value) 
                 session.commit()
-                return {"status": "OK"}
-            
+                return performance_evaluation.to_json()
             except Exception as e:
                 session.rollback()
                 return e

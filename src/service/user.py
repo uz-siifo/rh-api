@@ -16,7 +16,6 @@ class UserService(Service):
     - is_user(data): Verifica se um usuario existe com base em nome de usuario e senha.
     - get_by_id(data): Retorna os dados de um usuario com base em seu ID.
     - get_by_name(data): Retorna os dados de um usuario com base em seu nome.
-    - is_admin(username): Verifica se um usuario tem nivel de acesso admin.
 
     Atributos:
     - engine: Instancia do banco de dados utilizada para realizar as operacoes.
@@ -42,21 +41,21 @@ class UserService(Service):
 
     def update(self, data):
         
-        from sqlalchemy import update
         with Session(self.engine) as session:
             try:
-                stmt = (
-                    update(User)
-                    .where(User.id == data.get('id'))
-                    .values(nickname = data.get("nickname"))
-                )
-                session.execute(stmt)
+                user = session.query(User).filter(User.id == data.get("id")).first()
+
+                if user:
+                    for key, value in data.items():
+                        if (hasattr(user, key)):
+                            setattr(user, key, value)
+                    
                 session.commit()
-                return {"Status": "OK"}
+                return user.to_json()
             
-            except Exception as error:
+            except Exception as e:
                 session.rollback()
-                return error
+                return e
             
     def delete(self, data):
         from sqlalchemy import delete, or_
@@ -80,75 +79,60 @@ class UserService(Service):
                 session.execute(query)
                 session.commit()
                 return {"status": "OK"}
-            except Exception as error:
+            except Exception as e:
                 session.rollback()
-                return error
+                return e
 
     def get_all(self):
         with Session(self.engine) as session:
-            from sqlalchemy import select
-            query = select(User)
-
-            result = session.execute(query).scalars().all()
-            users = [user.to_json() for user in result]
-            return users
-    
-    def is_user(self, data):
-        with Session(self.engine) as session:
             try:
-                from sqlalchemy import select, and_
-                query = select(User).where(and_(
-                    User.username == data.get("username"),
-                    User.passwd == data.get("passwd")
-                ))
-
-                res = session.execute(query).fetchone()
-                
-                return res.tuple()[0].to_json()
+                from sqlalchemy import select
+                query = select(User)
+                result = session.execute(query).scalars().all()
+                users = [user.to_json() for user in result]
+                return users
             except Exception as e:
-                return e
+                return e    
         
     def get_by_id(self, data):
         with Session(self.engine) as session:
-            try:
-                user = session.scalar(
-                select(User).where(User.id == data.get('id'))
-                )
-
+            try:                
+                user = session.query(User).filter(User.id == data.get('id')).first()
                 return user.to_json()
             except Exception as e:
                 return e
 
     def get_by_name(self, data):
         with Session(self.engine) as session:
-            from sqlalchemy import Select
-            user = session.scalar(
-                Select(User).where(User.name == data.get('name'))
-            )
-
-            return user.to_json() 
-        
-    def is_admin(self, username):
+            try:
+                from sqlalchemy import Select
+                user = session.scalar(
+                    Select(User).where(User.name.ilike(data.get('name')))
+                )
+                return user.to_json() 
+            except Exception as e:
+                return e
+             
+    def get_by_username(self, data):
         with Session(self.engine) as session:
-            from sqlalchemy import select, and_
-            from utils.enums import Role
-
-            query = select(User).where(and_(
-                User.username.ilike(username),
-                User.role == Role.admin
-            ))
-
-            result = session.execute(query).fetchall()
-
-            return len(result) > 0
+            try:
+                user = session.query(User).filter(User.username.ilike(data.get("username"))).first()
+                return user.to_json()
+            except Exception as e:
+                return e
             
-    def get_id_by_username(self, data):
+    def is_user(self, data):
         with Session(self.engine) as session:
-            from sqlalchemy import select
-            query = select(User.id).where(
-                User.username.ilike(data.get("username"))
-            )
+            try:
+                from sqlalchemy import and_
 
-            result = session.execute(query).fetchone()
+                admin_user = session.query(User).filter(                    
+                    and_(
+                        User.username.ilike(data.get("username")),
+                        User.passwd.like(data.get("passwd"))
+                    )
+                ).first()
 
-            return result.tuple()[0]
+                return admin_user.to_json()
+            except Exception as e:
+                return e

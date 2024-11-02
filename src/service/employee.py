@@ -65,19 +65,15 @@ class EmployeeService(Service):
 
     def update(self, data):
         with Session(self.engine) as session:            
-            try:    
-                stmt = (
-                    update(Employee)
-                    .where(Employee.id == data.get('id'))
-                    .values(
-                        name=data.get('name'),
-                        position=data.get('position'),
-                        department=data.get('department')
-                    )
-                )
-                session.execute(stmt)
+            try:   
+                employee = session.query(Employee).filter(Employee.id == data.get("id")).first()
+
+                for key, value in data.items():
+                    if (hasattr(employee, key)):
+                        setattr(employee, key, value)
+
                 session.commit()
-                return {"status": "OK"}
+                return employee.to_json()
             except Exception as e:
                 session.rollback()
                 return e
@@ -86,10 +82,7 @@ class EmployeeService(Service):
         with Session(self.engine) as session:    
             try:
                 query = delete(Employee).where(
-                    or_(
-                        Employee.id == data.get('id'),
-                        Employee.identity_card_bi.like(data.get('identity_card_bi'))
-                    )
+                    Employee.id == data.get('id')
                 )
                 session.execute(query)
                 session.commit()

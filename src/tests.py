@@ -20,7 +20,30 @@ performance_evaluation_service = PerformanceEvaluationService(engine)
 presences_service = PresencesService(engine)
 user_employee_service = UserEmployeeService(engine)
 working_hours_service = WorkingHoursService(engine)
+# print(employee_service.create({
 
+#     "name": "Eloide",
+#     "nickname": "Novela",
+#     "username": "eloide-novela",
+#     "email": "eloide.novela@gmail.com",
+#     "passwd": "10134456",
+#     "role": "user",
+#     "position": "engineer",
+#     "state":"active",
+#     "length_of_service": 1,
+#     "date_admission": "2024-11-11",
+#     'academic_level': "Mestre",
+#     "department": "Informatica"
+# }))
+
+
+# from model.models import get_storage
+
+# get_storage()
+# print(user_service.get_all())
+
+# print(employee_rating_service.get_all())
+# print(performance_evaluation_service.get_all_())
 # print(user_employee_service.get_all_empl
 #oyee())
 
@@ -65,7 +88,7 @@ working_hours_service = WorkingHoursService(engine)
 #     "contact": "+258846937430",
 #     "username": "simao-pedro",
 #     "passwd": "10134456879",
-#     "access_level": "user"
+#     "role": "user"
 # }))
 
 
@@ -76,9 +99,6 @@ working_hours_service = WorkingHoursService(engine)
 
 # print(department_service.create({
 #     "name": "Informatica",
-#     "employee_nums": 10,
-#     "min_salary": 189893,
-#     "max_salary": 29299292
 # }))
 # from datetime import datetime
 # print(employee_service.create({
@@ -97,7 +117,7 @@ working_hours_service = WorkingHoursService(engine)
 #     "email": "emmanuel.sibanda@outlook.com",
 #     "passwd": "10134456",
 #     "username": "emmanuel-sibanda",
-#     "access_level": "user",
+#     "role": "user",
 #     "contact": "+258876454833"
 
 # }))
@@ -106,7 +126,7 @@ working_hours_service = WorkingHoursService(engine)
 # print(user_service.update({"id": 10, "nickname": "Sibanda"}))
 # print(contact_service.get_all())
 
-print(user_service.get_all())
+# print(user_service.get_all())
 # print(department_service.get_by_id({"id": 1}))
 
 # # print(user_ecle mployee_service.create({
@@ -120,7 +140,7 @@ print(user_service.get_all())
 #     "email": "eleuterio.novela@outlook.com",
 #     "passwd": "10134456",
 #     "username": "eleuterio-novela",
-#     "access_level": "user",
+#     "role": "user",
 #     "contact": "+258876548336"
 # }
 
@@ -128,15 +148,24 @@ print(user_service.get_all())
 
 #     print(key)
 
+# from model.models import get_storage
+
+# get_storage()
+
+
+# print(user_service.is_user({"username": "elda-novela", "passwd": "56441310"}))
+
 # print(user_service.create({
-#     "name": "Elda Simao",
+#     "name": "Eloid Simao",
 #     "nickname": "Novela",
-#     "email": "elda.novela@outlook.com",
+#     "email": "eloid.novela@outlook.com",
 #     "passwd": "56441310",
-#     "username": "elda-novela",
-#     "access_level": "admin",
-#     "contact": "+258876548339"
+#     "username": "eloid-novela",
+#     "role": "user",
+#     "contact": "+258867640575"
 # }))
+
+# print(user_service.get_all())
 
 # print(user_service.update({
 #     "nickname": "_chume",
@@ -165,14 +194,14 @@ print(user_service.get_all())
 
 # print("user_serive: ", user_service.get_all(), "\n\n\n")
 
-# # print(user_service.is_admin("eloide-novela"))
+print(user_service.is_user({"username": "josias-magumba"}))
 # print(user_service.create({
 #      "name": "Eloide Simao",
 #      "username": "eloide-novela",
 #      "nickname": "Novela",
 #     "email": "eloide.novela@outlook.com",
 #     "passwd": "1013eloide.novela",
-#     "access_level": "admin",
+#     "role": "admin",
 #     "contact": "+258867640575"
 # }))
 
@@ -213,3 +242,66 @@ print(user_service.get_all())
 # # {'some': 'payload'}
 
 # print(decoded.get("tipo_de_token"))
+
+
+
+#  "is_assiduous": performance_evaluation[0],
+#                     "is_collaborative": performance_evaluation[1],
+#                     "completed_goals": performance_evaluation[2],
+#                     "is_punctual": performance_evaluation[3], 
+#                     "presences": performance_evaluation[4],
+#                     "absences": performance_evaluation[5],
+#                     "work_quality_rating": performance_evaluation[6],
+#                     "problem_solving_skills_rating": performance_evaluation[7],
+#                     "communication_skills_rating": performance_evaluation[8],
+#                     "time_management_skills_rating": performance_evaluation[9],
+#                     "leadership_skills_rating": performance_evaluation[10]
+
+# dados = performance_evaluation_service.get_all()[0]
+
+# di = {}
+
+# di.update({"name": "eloid"})
+
+# print(di)
+
+# print(dados)
+# from workers.promotion import promoter_worker
+
+# print(promoter_worker(dados))
+
+
+# arr = {"a": 8, "b": 5,"c":  4,"d":  3,"e":  1}
+# a = arr.values()
+# for key in arr.keys():
+#     print(key)
+# print(arr.keys()[0])
+# print(performance_evaluation_service.get_all())
+
+# from threading import Thread
+
+
+# user = {
+#     "id": 1,
+#     "name": "Josias",
+#     "username": "josias-magumba",
+#     "nickname": "Magumba",
+#     "email": "josias.magumba@outlook.com",
+#     "passwd": "magumba"
+#     # "role": "admin",
+#     # "contact": "+258867640575"
+# }
+
+# print(user_service.update(user))
+
+# for key, value in user.items():
+#     print(key, value)
+
+# aux_user = {}
+# for key in user.keys():
+
+#     aux_user.update({key: user.get(key)})
+
+# print(aux_user)
+
+# print(user_service.get_all())

@@ -2,6 +2,7 @@ from pydantic import BaseModel
 
 class DepartmentData(BaseModel):
     name: str
+    
     def to_json(self):
         return {
             "name": self.name

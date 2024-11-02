@@ -72,13 +72,16 @@ async def get_current_admin(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except jwt.PyJWTError as e:
         print(f"Erro ao decodificar o token JWT: {e}")  # Loga o erro de decodificacao
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)  # Lanca excecao se o token for invalido
-
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED  # Lanca excecao se o token for invalido
+        )
+    
     # Verifica se o usuario e admin usando o servico de usuario
     from service.user import UserService
     user_service = UserService(engine)
+    password = user_service.get_by_username({"username": username})
 
-    if not user_service.is_admin(username):  # Se o usuario nao for admin, lanca uma excecao HTTP 403
+    if not user_service.is_user({"username": username, "passwd": password}):  # Se o usuario nao for admin, lanca uma excecao HTTP 403
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Somente Admins e que têm acesso a este servico",

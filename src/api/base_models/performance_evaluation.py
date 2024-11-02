@@ -1,4 +1,8 @@
 from pydantic import BaseModel
 
-class PerformaceEvaluation(BaseModel):
+class PerformaceEvaluationData(BaseModel):
     pass
+
+class UpdatePerformanceEvaluationData(BaseModel):
+    pass
+

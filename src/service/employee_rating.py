@@ -32,25 +32,15 @@ class EmployeeRatingService(Service):
             try:
                 from .goals import GoalsService
                 goals_service = GoalsService(self.engine)
-                stmt = (
-                    update(EmployeeRating)
-                    .where(EmployeeRating.id == data.get('id'))
-                    .values(
-                        is_assiduous=data.get('is_assiduous', False),
-                        is_collaborative=data.get('is_collaborative', False),
-                        completed_goals= len(goals_service.get_completed_goals_by_employee({"employee_id": data.get("employee_id")})),
-                        is_punctual=data.get('is_punctual', False),
-                        work_quality_rating=data.get('work_quality_rating', 0),
-                        problem_solving_skills_rating=data.get('problem_solving_skills_rating', 0),
-                        communication_skills_rating=data.get('communication_skills_rating', 0),
-                        time_management_skills_rating=data.get('time_management_skills_rating', 0),
-                        leadership_skills_rating=data.get('leadership_skills_rating', 0)
-                    )
-                )
-                session.execute(stmt)
+                employee_rating = session.query(EmployeeRating).filter(EmployeeRating.id == data.get("id")).first()
+                if employee_rating:
+                    for key, value in data.items():
+                        if (hasattr(employee_rating, key)):
+                            setattr(employee_rating, key, value)
+                employee_rating.completed_goals = goals_service.get_completed_goals_by_employee({"employee_id": data.get("employee_id")})
                 session.commit()
-                return {"status": "OK"}
-            
+
+                return employee_rating.to_json()
             except Exception as e:
                 session.rollback()
                 return e

@@ -33,13 +33,12 @@ class DepartmentService(Service):
         from sqlalchemy import update
         with Session(self.engine) as session:
             try:    
-                new_department = Department.to_model(data)
-                session.query(Department).filter(Department.id == data.get('id')).update(
-                    new_department.to_json()
-                )
-
+                department = session.query(Department).filter(Department.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(department, key)):
+                        setattr(department, key, value)
                 session.commit()
-                return new_department.to_json()
+                return department.to_json()
             except Exception as e:
                 session.rollback()
                 return e

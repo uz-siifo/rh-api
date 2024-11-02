@@ -15,54 +15,51 @@ class WorkingHoursService(Service):
                 session.commit()
                 return new_working_hours.to_json()
         except Exception as e:
-            return f"Error creating working hours record: {str(e)}"
+            return e
 
     def update(self, data):
         try:
             with Session(self.engine) as session:
-                stmt = (
-                    update(WorkingHours)
-                    .working_hourere(WorkingHours.id == data.get('id'))
-                    .values(
-                        normal_hours=data.get('normal_hours', 0),
-                        overtime=data.get('overtime', 0),
-                        employee_id=data.get('employee_id')
-                    )
-                )
-                session.execute(stmt)
+                working_hours = session.query(WorkingHours).filter(WorkingHours.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(working_hours, key)):
+                        setattr(working_hours, key, value)
                 session.commit()
-                return "Working hours record updated successfully"
+                return working_hours.to_json()
         except Exception as e:
-            return f"Error updating working hours record: {str(e)}"
+            return e
 
     def delete(self, data):
         try:
             with Session(self.engine) as session:
-                query = delete(WorkingHours).working_hourere(
+                query = delete(WorkingHours).where(
                     WorkingHours.id == data.get('id')
                 )
                 session.execute(query)
                 session.commit()
-                return "Working hours record deleted successfully"
+                return {"status": "OK"}
         except Exception as e:
-            return f"Error deleting working hours record: {str(e)}"
+            return e
 
     def get_all(self):
-        try:
-            with Session(self.engine) as session:
+        with Session(self.engine) as session:
+            try:
                 query = select(WorkingHours)
                 result = session.execute(query).scalars().all()
                 working_hours = [working_hour.to_json() for working_hour in result]
                 return working_hours
-        except Exception as e:
-            return f"Error fetching working hours records: {str(e)}"
-        
+            except Exception as e:
+                return e
+            
     def get_by_employee(self, data):
         with Session(self.engine) as session:
-            from sqlalchemy import select
-            query = select(WorkingHours).where(
-                WorkingHours.employee_id == data.get("employee_id")
-            )
-            result = session.execute(query).scalars().all()
-            working_hours = [working_hour.to_json() for working_hour in result]
-            return working_hours
+            try:
+                from sqlalchemy import select
+                query = select(WorkingHours).where(
+                    WorkingHours.employee_id == data.get("employee_id")
+                )
+                result = session.execute(query).scalars().all()
+                working_hours = [working_hour.to_json() for working_hour in result]
+                return working_hours
+            except Exception as e:
+                return e

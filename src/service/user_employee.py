@@ -46,25 +46,17 @@ class UserEmployeeService(Service):
     def update(self, data):
         with Session(self.engine) as session:
             try:
-                from sqlalchemy import update
-                query = None
-                for key in data.keys():
-                    if (data.get("emloyee_id")):
-                        query = update(UserEmployee).where(
-                            id == data.get("id")
-                        ).values(employee_id = data.get("employee_id"))
-                    elif (data.get("user_id")):
-                        query = update(UserEmployee).where(
-                            id == data.get("id")
-                        ).values(user_id = data.get("user_id"))
-                session.execute(query)
+                user_employee = session.query(UserEmployee).filter(UserEmployee.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(user_employee, key)):
+                        setattr(user_employee, key, value)
                 session.commit()
-                return {"status": "OK"}
+                return user_employee.to_json()
             except Exception as error:
                 session.rollback()
                 return str(error)
 
-    def get_all(self) -> list:
+    def get_all(self):
         from sqlalchemy import Select
         with Session(self.engine) as session:
             query = Select(UserEmployee)

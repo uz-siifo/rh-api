@@ -29,27 +29,12 @@ class ProgressionService(Service):
     def update(self, data):
         with Session(self.engine) as session:
             try:
-                from sqlalchemy import update
-
-                stmt = None
-                for key in data.keys():
-                    if (key == "description"):
-                        stmt = update(Progression).where(
-                            Progression.id == data.get("id")
-                        ).values(
-                            description = data.get("description")
-                        )     
-
-                    if (key == "employee_id"):
-                        stmt = update(Progression).where(
-                            Progression.id == data.get("id")
-                        ).values(
-                            employee_id = data.get("employee_id")
-                        )
-                session.execute(stmt)
+                progression = session.query(Progression).filter(Progression.id == data.get("id")).first()
+                for key, value in data.items():
+                    if (hasattr(progression, key)):
+                        setattr(progression, key, value)
                 session.commit()
-                return {"status": "OK"}
-
+                return progression.to_json()
             except Exception as e:
                 session.rollback()
                 return e

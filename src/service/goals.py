@@ -21,20 +21,16 @@ class GoalsService(Service):
     def update(self, data):
         with Session(self.engine) as session:
             try:
-                stmt = (
-                    update(Goals)
-                    .where(Goals.id == data.get('id'))
-                    .values(
-                        description=data.get('description'),
-                        start_date=data.get('start_date'),
-                        conclusion_date=data.get('conclusion_date'),
-                        end_date=data.get('end_date'),
-                        employee_id=data.get('employee_id')
-                    )
-                )
-                session.execute(stmt)
+
+                goal = session.query(Goals).filter(Goals.id == data.get("id")).first()
+
+                if (goal):
+                    for key, value in data.items():
+                        if hasattr(goal, key):
+                            setattr(goal, key, value)
+
                 session.commit()
-                return {"status": "OK"}
+                return goal.to_json()
             except Exception as e:
                 session.rollback()
                 return e

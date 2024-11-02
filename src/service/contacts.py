@@ -43,16 +43,14 @@ class ContactService(Service):
         from utils.util import util
         if (util.is_contact(data.get('contact'))):
             try:
-                from sqlalchemy import update
                 with Session(self.engine) as session:
-                    stmt = (
-                        update(UserContact)
-                        .where(UserContact.id == data.get('id'))
-                        .values(contact = data.get('contact'))
-                    )
-                    session.execute(stmt)
+
+                    contact = session.query(UserContact).filter(UserContact.id == data.get("id")).first()
+                    for key, value in data.items():
+                        if (hasattr(contact, key)):
+                            setattr(contact, key, value)
                     session.commit()
-                    return {"status": "OK"}
+                    return contact.to_json()
             except Exception as error:
                 session.rollback()
                 return error
